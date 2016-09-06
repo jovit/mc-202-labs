@@ -194,14 +194,14 @@ void print_list(IntList *list) {
     printf("\n");
 }
 
-int main(void) {
+int main(void) {https://issues.movile.com/browse/TI-6811
     int number_read, m, n, p;
-    char char_read = 0;
+    char char_read = ' ';
     IntList *original_list, *first_list, *second_list, *third_list;
 
     original_list = create_list();
 
-    while (char_read != '\n') {
+    while (char_read == ' ') {
         scanf("%d%c", &number_read, &char_read);
         add_to_list(original_list, number_read);
     }
