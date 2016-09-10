@@ -2,15 +2,15 @@
 #define LIST_H
 
 typedef struct Node {
-    struct Node* next;
+    struct Node *next;
     int value;
 } Node;
 
 typedef struct List {
-    Node* first;
+    Node *first;
 } IntList;
 
-IntList* create_list();
+IntList* create_list(); // allocates a new list
 void free_list(IntList* list);
 void add_to_list(IntList* list, int value);
 

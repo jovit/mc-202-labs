@@ -3,5 +3,5 @@ project(lab01)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c")
 
-set(SOURCE_FILES main.c)
+set(SOURCE_FILES main.c IntList.c)
 add_executable(lab01 ${SOURCE_FILES})
