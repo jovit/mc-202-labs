@@ -20,11 +20,7 @@ int perform_operation(char operation, int value, IntList *list, enum operation_t
                 return tr_access(list, value);
             }
         case REMOVE_OPERATION:
-            if (type == MOVE_TO_FRONT) {
-                return mtf_remove(list, value);
-            } else {
-                return tr_remove(list, value);
-            }
+            return remove_with_cost(list, value);
         case INSERT_OPERATION:
             if (type == MOVE_TO_FRONT) {
                 return mtf_add(list, value);
