@@ -152,8 +152,7 @@ int mtf_add(IntList *list, int value) {
     return cost + 1;
 }
 
-
-
+// performs the transpose operation
 void transpose(Node *node, IntList *list) {
     Node *aux_node;
     node->previous->next = node->next;
@@ -164,13 +163,12 @@ void transpose(Node *node, IntList *list) {
 
     node->next = node->previous;
 
-    if (node->previous != list->first){
-
+    if (node->previous != list->first) {
         node->previous->previous->next = node;
         aux_node = node->previous;
         node->previous = node->previous->previous;
         aux_node->previous = node;
-    } else {
+    } else { // if it has become the first element from the list
         list->first->previous = node;
         node->previous = NULL;
         list->first = node;

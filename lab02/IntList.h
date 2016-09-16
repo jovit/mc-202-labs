@@ -1,5 +1,5 @@
-#ifndef MTF_INT_LIST_H
-#define MTF_INT_LIST_H
+#ifndef INT_LIST_H
+#define INT_LIST_H
 
 typedef struct Node {
     struct Node *next;

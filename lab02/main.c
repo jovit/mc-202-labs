@@ -11,6 +11,7 @@ enum operation_type {
     TRANSPOSE
 };
 
+// perform a operation for a certain list type
 int perform_operation(char operation, int value, IntList *list, enum operation_type type) {
     switch (operation) {
         case ACCESS_OPERATION:
@@ -61,13 +62,14 @@ int main(void) {
 
     scanf("%d %d", &number_of_values, &number_of_requisitions);
 
+    // create the original lists
     for (i = 0; i < number_of_values; i++) {
         scanf("%d", &value);
         add_to_list(mtf_list, value);
         add_to_list(tr_list, value);
     }
 
-
+    // perform the operations
     for (i = 0; i < number_of_requisitions; i++) {
         scanf(" %c %d", &operation, &value);
         mtf_cost += perform_operation(operation, value, mtf_list, MOVE_TO_FRONT);

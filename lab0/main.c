@@ -10,8 +10,6 @@ int **ler_matriz(char *nome) {
 
 }
 
-
-
 int main(void) {
 
     printf("teste");
