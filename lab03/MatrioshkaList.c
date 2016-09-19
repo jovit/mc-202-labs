@@ -26,6 +26,7 @@ void free_list(MatrioshkaList *list) {
     // free all nodes from list
     while (current != NULL) {
         next = current->next;
+        free(current->value);
         free(current);
         current = next;
     }
@@ -36,23 +37,30 @@ void free_list(MatrioshkaList *list) {
 void add_to_list(MatrioshkaList *list, int value) {
     ListNode *current_node;
     ListNode *new_node = malloc(sizeof(ListNode));
+    MatrioshkaList *new_matrioshka = malloc(sizeof(Matrioshka));
 
     validate_malloc(new_node);
+    validate_malloc(new_matrioshka);
 
-    new_node->value = value;
+    new_matrioshka->value = value;
+    new_node->value = new_matrioshka;
     new_node->next = NULL;
-    new_node->previous = NULL;
 
     if (list->first == NULL) { // if list is empty
         list->first = new_node;
     } else {
         current_node = list->first;
 
-        while (current_node->next != NULL) { // find last node from list
+        while (current_node->next != NULL
+            && current_node->next->value->value < new_matrioshka->value) { // find last node from list
+            
             current_node = current_node->next;
         }
-
+        new_node->next = current_node->next;
         current_node->next = new_node; // put new value in the end of the list
-        new_node->previous = current_node;
     }
+}
+
+Matrioshka *get(MatrioshkaList *list) {
+    
 }

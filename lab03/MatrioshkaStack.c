@@ -10,7 +10,7 @@ void validate_malloc(void *pointer) {
     }
 }
 
-void push(Stack *stack, int value) {
+void push(MatrioshkaStack *stack, Matrioshka *value) {
     StackNode *new_node = malloc(sizeof(StackNode));
 
     validate_malloc(new_node);
@@ -22,8 +22,8 @@ void push(Stack *stack, int value) {
 
 }
 
-int pop(Stack *stack) {
-    int value;
+Matrioshka *pop(MatrioshkaStack *stack) {
+    Matrioshka *value;
     StackNode *next_node;
 
     if (!is_empty(stack)) {
@@ -38,19 +38,19 @@ int pop(Stack *stack) {
     return value;
 }
 
-char is_empty(Stack *stack) {
+char is_empty(MatrioshkaStack *stack) {
     return stack->top == NULL;
 }
 
-Stack *new_stack() {
-    Stack *new_stack = malloc(sizeof(Stack));
+MatrioshkaStack *new_stack() {
+    MatrioshkaStack *new_stack = malloc(sizeof(MatrioshkaStack));
     validate_malloc(new_stack);
     new_stack->top = NULL;
     return new_stack;
 }
 
-int peek(Stack *stack) {
-    int value;
+Matrioshka *peek(MatrioshkaStack *stack) {
+    Matrioshka *value;
 
     if (!is_empty(stack)) {
         value = stack->top->value;
@@ -63,7 +63,7 @@ int peek(Stack *stack) {
 
 void free_stack(Stack *stack) {
     while(!is_empty(stack)) {
-        pop(stack);
+        free(pop(stack));
     }
 
     free(stack);
