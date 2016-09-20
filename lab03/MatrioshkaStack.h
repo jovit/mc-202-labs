@@ -3,17 +3,17 @@
 #include "Matrioshka.h"
 
 typedef struct StackNode {
-    Matrioshka *value;
+    Matrioshka *matrioshka;
     struct StackNode *next;
 } StackNode;
 
-typedef struct MatrioshkaStack {
+typedef struct {
     StackNode *top;
-} Stack;
+} MatrioshkaStack;
 
-Stack *new_stack();
+MatrioshkaStack *new_stack();
 
-void push(MatrioshkaStack *stack, Matrioshka *value);
+void push(MatrioshkaStack *stack, Matrioshka *matrioshka);
 
 Matrioshka *pop(MatrioshkaStack *stack);
 

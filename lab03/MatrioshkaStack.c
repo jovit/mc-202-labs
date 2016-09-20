@@ -1,21 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "Stack.h"
+#include "MallocUtils.h"
+#include "MatrioshkaStack.h"
 
-// validate if the malloc has not failed
-void validate_malloc(void *pointer) {
-    if (pointer == NULL) {
-        printf("Out of memory");
-        exit(1);
-    }
-}
-
-void push(MatrioshkaStack *stack, Matrioshka *value) {
+void push(MatrioshkaStack *stack, Matrioshka *matrioshka) {
     StackNode *new_node = malloc(sizeof(StackNode));
 
     validate_malloc(new_node);
 
-    new_node->value = value;
+    new_node->matrioshka = matrioshka;
 
     new_node->next = stack->top;
     stack->top = new_node;
@@ -27,7 +20,7 @@ Matrioshka *pop(MatrioshkaStack *stack) {
     StackNode *next_node;
 
     if (!is_empty(stack)) {
-        value = stack->top->value;
+        value = stack->top->matrioshka;
         next_node = stack->top->next;
         free(stack->top);
         stack->top = next_node;
@@ -53,7 +46,7 @@ Matrioshka *peek(MatrioshkaStack *stack) {
     Matrioshka *value;
 
     if (!is_empty(stack)) {
-        value = stack->top->value;
+        value = stack->top->matrioshka;
     } else {
         value = NULL;
     }
@@ -61,10 +54,9 @@ Matrioshka *peek(MatrioshkaStack *stack) {
     return value;
 }
 
-void free_stack(Stack *stack) {
+void free_stack(MatrioshkaStack *stack) {
     while(!is_empty(stack)) {
         free(pop(stack));
     }
-
     free(stack);
 }
