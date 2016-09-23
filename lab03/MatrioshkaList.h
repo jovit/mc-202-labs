@@ -13,7 +13,7 @@ typedef struct {
 } MatrioshkaList;
 
 MatrioshkaList *new_list(); // allocates a new list
-void free_list(MatrioshkaList *list);
+void free_list(MatrioshkaList *list); // deletes all matrioshkas from list
 char add_to_list(MatrioshkaList *list, Matrioshka *matrioshka);
 
 #endif

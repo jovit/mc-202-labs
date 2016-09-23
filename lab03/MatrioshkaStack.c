@@ -8,7 +8,7 @@ void push(MatrioshkaStack *stack, Matrioshka *matrioshka) {
 
     validate_malloc(new_node);
 
-    new_node->matrioshka = matrioshka;
+    new_node->matrioshka = matrioshka; // put new matrioshka on the top
 
     new_node->next = stack->top;
     stack->top = new_node;
@@ -19,7 +19,7 @@ Matrioshka *pop(MatrioshkaStack *stack) {
     Matrioshka *value;
     StackNode *next_node;
 
-    if (!is_empty(stack)) {
+    if (!is_empty(stack)) { // if the stack is not empty, removes and returns the top
         value = stack->top->matrioshka;
         next_node = stack->top->next;
         free(stack->top);
@@ -45,7 +45,7 @@ MatrioshkaStack *new_stack() {
 Matrioshka *peek(MatrioshkaStack *stack) {
     Matrioshka *value;
 
-    if (!is_empty(stack)) {
+    if (!is_empty(stack)) { // if the stack is not empty, return the top
         value = stack->top->matrioshka;
     } else {
         value = NULL;
@@ -55,7 +55,7 @@ Matrioshka *peek(MatrioshkaStack *stack) {
 }
 
 void free_stack(MatrioshkaStack *stack) {
-    while(!is_empty(stack)) {
+    while(!is_empty(stack)) { // empty the whole stack
         free(pop(stack));
     }
     free(stack);

@@ -38,34 +38,36 @@ char add_to_list(MatrioshkaList *list, Matrioshka *matrioshka) {
 
     if (list->first == NULL) { // if list is empty
         list->first = new_node;
-    } else if (list->first->matrioshka->value > matrioshka->value) {
+    } else if (list->first->matrioshka->value > matrioshka->value) { // if should be the first element
         new_node->next = list->first;
         list->first = new_node;
-    } else if (list->first->matrioshka->value == matrioshka->value) {
+    } else if (list->first->matrioshka->value == matrioshka->value) { // if the first matrioshka has the same value
         free(new_node);
 
-        if (list->first->matrioshka->color != matrioshka->color) {
+        if (list->first->matrioshka->color != matrioshka->color) { // if they have different colors, it fails to add
             return 0;
         }
     } else {
         current_node = list->first;
 
         while (current_node->next != NULL
-            && current_node->next->matrioshka->value < new_node->matrioshka->value) { // find last node from list
+            && current_node->next->matrioshka->value < new_node->matrioshka->value) { // find place to add the matrioshka
             
             current_node = current_node->next;
         }
+
+        // if the next matrioshka is the same as the one being added
         if (current_node->next != NULL && current_node->next->matrioshka->value == matrioshka->value) {
             free(new_node);
-
+            // checks if the color is the same
             if (current_node ->next->matrioshka->color != matrioshka->color) {
                 return 0;
             }
-        } else {
+        } else { // else add the value to the correct position in the list
             new_node->next = current_node->next;
-            current_node->next = new_node; // put new value in the end of the list
+            current_node->next = new_node;
         }
 
     }
-    return 1;
+    return 1; // successfully added the matrioshka
 }
