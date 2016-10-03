@@ -1,88 +1,88 @@
-
 #include <stdio.h>
 #include <stdlib.h>
-#include "MallocUtils.h"
-#include "MatrioshkaStack.h"
-#include "MatrioshkaList.h"
+#include <math.h>
 
-#define ERROR_MESSAGE "sequencia invalida ou nao pode colorir"
-#define SUCCESS_MESSAGE "sequencia valida pode ser colorida"
+typedef struct {
+    char sudoku_number;
+    int column;
+} QueenPositionOption;
 
-void print_matrioshka_list(MatrioshkaList *matrioshka_list) {
-    ListNode *current = matrioshka_list->first;
-    while (current != NULL) {
-        if (current->matrioshka->color == BLUE) {
-            printf("\n%d: azul", current->matrioshka->value);
-        } else {
-            printf("\n%d: vermelho", current->matrioshka->value);
+
+
+char valid_position(QueenPositionOption *positions, int current) {
+    int i;
+    for (i = 0; i < current; i++) {
+        if (positions[i].sudoku_number == positions[current].sudoku_number) {
+            return 0;
         }
 
-        current = current->next;
+        if (positions[i].column == positions[current].column) {
+            return 0;
+        }
+
+        if (abs(positions[i].column - positions[current].column) == abs(current - i)) {
+            return 0;
+        }
+
+    }
+    return 1;
+}
+
+char do_exists_solution(char **board, QueenPositionOption *positions, int currentLine, int dimension) {
+    int i;
+
+    if (currentLine == dimension) {
+        return 1;
+    } else {
+        for (i = 0; i < dimension; i++) {
+            QueenPositionOption positionOption;
+            positionOption.column = i;
+            positionOption.sudoku_number = board[currentLine][i];
+            positions[currentLine] = positionOption;
+            if (valid_position(positions, currentLine)) {
+                if (do_exists_solution(board, positions, currentLine+1, dimension)) {
+                    return 1;
+                }
+            }
+
+        }
     }
 
+    return 0;
+}
+
+char exists_solution(char **board, int dimension) {
+    QueenPositionOption *positions = malloc(sizeof(QueenPositionOption) * dimension);
+    char exists =  do_exists_solution(board, positions, 0, dimension);
+
+    free(positions);
+
+    return exists;
 }
 
 int main(void) {
-    int size, i, value, sum;
-    char invalid_matrioshka = 0;
-    MatrioshkaStack *matrioshka_stack = new_stack();
-    MatrioshkaList *matrioshka_list = new_list();
-    Matrioshka *new_matrioshka, *top_matrioshka;
+    int dimension;
+    char **board;
+    int i, j;
 
-    scanf("%d", &size);
+    scanf("%d", &dimension);
 
-    for (i = 0; i < size; i++) {
-        scanf("%d", &value);
-        if (value < 0) { // if its the opening of a mtrioshka
-            new_matrioshka = malloc(sizeof(Matrioshka));
-            validate_malloc(new_matrioshka);
-            new_matrioshka->value = -value;
-            new_matrioshka->blue_child = 0;
-
-            push(matrioshka_stack, new_matrioshka); // add new matrioshka to the stack
-        } else { // if its closing a matrioshka
-            if (peek(matrioshka_stack)->value != value) { // closing the wrong matrioshka
-                printf(ERROR_MESSAGE);
-                invalid_matrioshka = 1;
-                break;
-            } else {
-                top_matrioshka = pop(matrioshka_stack); // get the matrioshka being closed
-                sum = top_matrioshka->value + top_matrioshka->blue_child; // sum to check if its blue or red
-
-                if (sum % 2 == 0) {
-                    top_matrioshka->color = BLUE;
-                    if (!is_empty(matrioshka_stack)) { // if its blue, add to the parent blue children count
-                        peek(matrioshka_stack)->blue_child += 1;
-                    }
-                } else {
-                    top_matrioshka->color = RED;
-                }
-
-                // if already have the same matrioshka with other color
-                if (!add_to_list(matrioshka_list, top_matrioshka)) {
-                    free(top_matrioshka);
-                    printf(ERROR_MESSAGE);
-                    invalid_matrioshka = 1;
-                    break;
-                }
-            }
-
-            if (is_empty(matrioshka_stack) && i < size-1) { // if there's more than one matrioshka with no parent
-                printf(ERROR_MESSAGE);
-                invalid_matrioshka = 1;
-                break;
-            }
-
+    board = malloc(sizeof(char*) * dimension);
+    for (i = 0; i < dimension; i++) {
+        board[i] = malloc(sizeof(char) * dimension);
+        for (j = 0; j < dimension; j++) {
+            scanf(" %c", &board[i][j]);
         }
     }
 
-    if (!invalid_matrioshka ) { // if the list of matrioshkas was valid
-        printf(SUCCESS_MESSAGE);
-        print_matrioshka_list(matrioshka_list);
+    if (exists_solution(board, dimension)) {
+        printf("Tem solucao.");
+    } else {
+        printf("Sem solucao.");
+    }
+    for (i = 0; i < dimension; i++) {
+        free(board[i]);
     }
 
-    free_list(matrioshka_list);
-    free_stack(matrioshka_stack);
-
-    return 0;
+    free(board);
 }
