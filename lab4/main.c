@@ -5,21 +5,23 @@
 typedef struct {
     char sudoku_number;
     int column;
-} QueenPositionOption;
+} QueenPosition; // determines a position of a queen in the board
 
-
-
-char valid_position(QueenPositionOption *positions, int current) {
+// checks if the positions of the queens is valid for the last added queen
+char valid_position(QueenPosition *positions, int current) {
     int i;
     for (i = 0; i < current; i++) {
+        // check if the sudoku_number is repeated
         if (positions[i].sudoku_number == positions[current].sudoku_number) {
             return 0;
         }
 
+        // check if there's another queen in the same column
         if (positions[i].column == positions[current].column) {
             return 0;
         }
 
+        // check if there's a queen on the diagonal
         if (abs(positions[i].column - positions[current].column) == abs(current - i)) {
             return 0;
         }
@@ -28,19 +30,21 @@ char valid_position(QueenPositionOption *positions, int current) {
     return 1;
 }
 
-char do_exists_solution(char **board, QueenPositionOption *positions, int currentLine, int dimension) {
+// auxiliar recursive function for exists_position
+char do_exists_solution(char **board, QueenPosition *positions, int currentLine, int dimension) {
     int i;
-
+    // if has ended going through the lines
     if (currentLine == dimension) {
         return 1;
     } else {
+        // position the queen on each column of the line, looking for a valid position
         for (i = 0; i < dimension; i++) {
-            QueenPositionOption positionOption;
+            QueenPosition positionOption;
             positionOption.column = i;
-            positionOption.sudoku_number = board[currentLine][i];
-            positions[currentLine] = positionOption;
-            if (valid_position(positions, currentLine)) {
-                if (do_exists_solution(board, positions, currentLine+1, dimension)) {
+            positionOption.sudoku_number = board[currentLine][i]; // set the corresponding sudoku number from the board
+            positions[currentLine] = positionOption; // fix the queen of the line
+            if (valid_position(positions, currentLine)) { // if the position for the queen is valid for the other queens already positioned
+                if (do_exists_solution(board, positions, currentLine+1, dimension)) { // if there's a solution with the queen in the current column
                     return 1;
                 }
             }
@@ -51,8 +55,9 @@ char do_exists_solution(char **board, QueenPositionOption *positions, int curren
     return 0;
 }
 
+// check if there's a solution for a certain board
 char exists_solution(char **board, int dimension) {
-    QueenPositionOption *positions = malloc(sizeof(QueenPositionOption) * dimension);
+    QueenPosition *positions = malloc(sizeof(QueenPosition) * dimension); // stores the possible queen positions determined so far
     char exists =  do_exists_solution(board, positions, 0, dimension);
 
     free(positions);
