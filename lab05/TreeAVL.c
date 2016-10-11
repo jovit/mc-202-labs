@@ -39,6 +39,38 @@ TreeAVLNode *new_node(char file_name[25]) {
     return node;
 }
 
+TreeAVLNode *rotate_to_left(TreeAVLNode *node) {
+    TreeAVLNode *aux;
+    aux = node->right;
+
+    if (aux->balancing_factor == 1) {
+        node->balancing_factor = -1;
+    } else {
+        node->balancing_factor = 0;
+    }
+
+    node->right = aux->left;
+    aux->left = node;
+
+    return aux;
+}
+
+TreeAVLNode *rotate_to_right(TreeAVLNode *node) {
+    TreeAVLNode *aux;
+    aux = node->left;
+
+    if (aux->balancing_factor == -1) {
+        node->balancing_factor = 1;
+    } else {
+        node->balancing_factor = 0;
+    }
+
+    node->left = aux->right;
+    aux->right = node;
+
+    return aux;
+}
+
 char do_add(TreeAVLNode *node, char file_name[25]) {
     int names_comparation = strcmp(node->file_name, file_name);
     char did_height_grow = 0;
@@ -64,13 +96,15 @@ char do_add(TreeAVLNode *node, char file_name[25]) {
             }
 
             if (node->balancing_factor < -1) {
-                // rodar para a direita
+                if (node->right->balancing_factor > 0) {
+                    node->left = rotate_to_right(node->left);
+                }
+                rotate_to_right(node);
+                did_height_grow = 0;
             }
         }
 
     } else {
-        // pra direita
-        // pra esquerda
         if (node->right == NULL) {
             node->right = new_node(file_name);
 
@@ -87,7 +121,13 @@ char do_add(TreeAVLNode *node, char file_name[25]) {
             }
 
             if (node->balancing_factor > 1) {
-                // rodar para a esquerda
+
+                if (node->right->balancing_factor < 0) {
+                    node->right = rotate_to_right(node->right);
+                }
+
+                rotate_to_left(node);
+                did_height_grow = 0;
             }
         }
     }
@@ -95,7 +135,7 @@ char do_add(TreeAVLNode *node, char file_name[25]) {
     return did_height_grow;
 }
 
-void add(TreeAVL *tree, char file_name[25]) {
+void insert_to_tree(TreeAVL *tree, char *file_name) {
     if (tree->root == NULL) {
         tree->root = new_node(file_name);
     } else {
@@ -103,12 +143,12 @@ void add(TreeAVL *tree, char file_name[25]) {
     }
 }
 
-void remove(TreeAVL *tree, char char file_name[25]) {
+void remove_from_tree(TreeAVL *tree, char *file_name) {
 
 }
 
 
 
-char **get(TreeAVL *tree, char char file_name[25]) {
+char **get(TreeAVL *tree, char file_name[25]) {
     return NULL;
 }

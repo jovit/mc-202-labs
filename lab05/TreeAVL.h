@@ -13,8 +13,8 @@ typedef struct {
 } TreeAVL;
 
 TreeAVL *create_tree();
-void add(TreeAVL *tree, char file_name[25]);
-void remove(TreeAVL *tree, char file_name[25]);
+void insert_to_tree(TreeAVL *tree, char *file_name);
+void remove_from_tree(TreeAVL *tree, char *file_name);
 void free_tree(TreeAVL* tree);
 char **get(TreeAVL* tree, char file_name[25]);
 
