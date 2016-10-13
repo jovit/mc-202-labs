@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "MallocUtils.h"
+#include "Utils.h"
 
 void validate_malloc(void *pointer) {
     if (pointer == NULL) {

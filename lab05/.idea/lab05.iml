@@ -5,9 +5,9 @@
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/main.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TreeAVL.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/MallocUtils.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Utils.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TreeAVL.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/MallocUtils.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Utils.c" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
