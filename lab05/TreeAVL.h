@@ -16,9 +16,10 @@ typedef struct {
 
 TreeAVL *create_tree();
 void insert_to_tree(TreeAVL *tree, char file_name[FILE_NAME_SIZE]);
+// remove nodes that match the expression
 char remove_from_tree(TreeAVL *tree, char expression[FILE_NAME_SIZE]);
-TreeAVLNode *do_remove(TreeAVLNode *node, char expression[FILE_NAME_SIZE], char *found);
 void free_tree(TreeAVL* tree);
+// list the nodes that match the expression
 char list(TreeAVL* tree, char expression[FILE_NAME_SIZE]);
 
 #endif

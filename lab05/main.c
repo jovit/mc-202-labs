@@ -12,6 +12,7 @@ int main(void) {
     char file_name[25];
     TreeAVL *tree = create_tree();
 
+    // while hasn't finished reading values
     while (scanf(" %s %s", command_read, file_name) != EOF) {
         if (strcmp(TOUCH, command_read) == 0) {
             insert_to_tree(tree, file_name);

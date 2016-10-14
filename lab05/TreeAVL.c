@@ -4,7 +4,7 @@
 #include "TreeAVL.h"
 #include "Utils.h"
 
-
+// get's the height difference between the two children of the node
 int height_difference(TreeAVLNode *node) {
     int right_height = 0, left_height = 0;
     if (node->left) {
@@ -18,6 +18,7 @@ int height_difference(TreeAVLNode *node) {
     return right_height - left_height;
 }
 
+// gets the height of a node based on the heights of its children
 int get_height(TreeAVLNode *node) {
     int right_height = 0, left_height = 0;
     if (node->left) {
@@ -42,6 +43,7 @@ TreeAVL *create_tree() {
     return new_tree;
 }
 
+// frees the nodes from a tree
 void free_tree_node(TreeAVLNode *node) {
     if (node != NULL) {
         free_tree_node(node->right);
@@ -57,6 +59,7 @@ void free_tree(TreeAVL *tree) {
     }
 }
 
+// initializes a new node
 TreeAVLNode *new_node(char file_name[FILE_NAME_SIZE]) {
     TreeAVLNode *node = malloc(sizeof(TreeAVLNode));
     validate_malloc(node);
@@ -77,6 +80,7 @@ TreeAVLNode *rotate_to_left(TreeAVLNode *node) {
     node->right = aux->left;
     aux->left = node;
 
+    // update the heights
     node->height = get_height(node);
     aux->height = get_height(aux);
 
@@ -90,37 +94,40 @@ TreeAVLNode *rotate_to_right(TreeAVLNode *node) {
     node->left = aux->right;
     aux->right = node;
 
+    // update the heights
     node->height = get_height(node);
     aux->height = get_height(aux);
 
     return aux;
 }
 
-
+// companion recursive function to insert_to_tree
 TreeAVLNode *do_add(TreeAVLNode *node, char file_name[FILE_NAME_SIZE]) {
-    int names_comparation;
+    int names_comparison;
 
-    if (node == NULL) {
+    if (node == NULL) { // empty tree
         return new_node(file_name);
     } else {
-        names_comparation = strcmp(node->file_name, file_name);
+        names_comparison = strcmp(node->file_name, file_name);
 
-        if (names_comparation == 0) {
+        if (names_comparison == 0) { // repeated file name
             node->count++;
-        } else if (names_comparation > 0) {
+        } else if (names_comparison > 0) { // add in the left
             node->left = do_add(node->left, file_name);
-        } else {
+        } else { // add in the right
             node->right = do_add(node->right, file_name);
         }
 
+        // update the height
         node->height = get_height(node);
 
-        if (height_difference(node) > 1) {
+        // check balance
+        if (height_difference(node) > 1) { // if unbalanced to the right
             if (height_difference(node->right) < 0) {
                 node->right = rotate_to_right(node->right);
             }
             node = rotate_to_left(node);
-        } else if (height_difference(node) < -1) {
+        } else if (height_difference(node) < -1) { // if unbalanced to the left
             if (height_difference(node->left) > 0) {
                 node->left = rotate_to_left(node->left);
             }
@@ -136,11 +143,12 @@ void insert_to_tree(TreeAVL *tree, char *file_name) {
     tree->root = do_add(tree->root, file_name);
 }
 
+// check if string matches expression
 char match(char expression[FILE_NAME_SIZE], char file_name[FILE_NAME_SIZE]) {
-    int length = (int) strlen(expression);
+    int length = strlen(expression);
     int i;
 
-    for (i = 0; i < length-1; i++) {
+    for (i = 0; i < length; i++) {
         if (expression[i] != file_name[i]) {
             return 0;
         }
@@ -149,142 +157,92 @@ char match(char expression[FILE_NAME_SIZE], char file_name[FILE_NAME_SIZE]) {
     return 1;
 }
 
-TreeAVLNode *delete_node(TreeAVLNode *node) {
-    TreeAVLNode *aux, *aux_parent;
-    char found;
-
-    if (node->right == NULL && node->left == NULL) {
-        free(node);
-        return NULL;
-    } else if( node->left == NULL || node->right == NULL) {
-        if (node->left == NULL) {
-            aux = node->left;
-        } else {
-            aux = node->right;
-        }
-
-        *node = *aux;
-
-        free(aux);
-    } else  {
-        aux = node->right;
-        aux_parent = node;
-
-        while (aux->left != NULL) {
-            aux_parent = aux;
-            aux = aux->left;
-        }
-
-        strcpy(node->file_name, aux->file_name);
-
-        node->right = do_remove(aux_parent, aux->file_name, &found);
-    }
-
-    node->height = get_height(node);
-
-    if (height_difference(node) > 1) {
-        if (height_difference(node->right) < 0) {
-            node->right = rotate_to_right(node->right);
-        }
-        node = rotate_to_left(node);
-    } else if (height_difference(node) < -1) {
-        if (height_difference(node->left) > 0) {
-            node->left = rotate_to_left(node->left);
-        }
-        node = rotate_to_right(node);
-    }
-
-    return node;
-}
-
-TreeAVLNode *do_remove(TreeAVLNode *node, char expression[FILE_NAME_SIZE], char *found) {
-    int names_comparation;
+// companion recursive function to remove_from_tree
+char do_remove(TreeAVLNode *node, char expression[FILE_NAME_SIZE]) {
+    int names_comparison;
     int file_name_size;
+    char found = 0;
 
-    if (node == NULL) {
-        *found |= 0;
+    if (node == NULL) { // if the tree is empty
+        return 0;
     } else {
-        names_comparation = strcmp(node->file_name, expression);
+        names_comparison = strcmp(node->file_name, expression);
         file_name_size = (int) strlen(expression);
 
-        if (expression[file_name_size-1] == '*') {
-            if (match(expression, node->file_name)) {
-                *found = 1;
+        if (expression[file_name_size-1] == '*') { // if it's an expression
+            expression[file_name_size-1] = '\0';
 
-                node = delete_node(node);
-
-                if (node != NULL && node->left != NULL && match(expression, node->left->file_name)){
-                    node->left = do_remove(node->left, expression, found);
+            if (match(expression, node->file_name)) { // check if found a matching candidate
+                if (node->count > 0) {
+                    node->count = 0;
+                    found = 1;
                 }
-
-                if (node != NULL && node->right != NULL && match(expression, node->right->file_name)){
-                    node->right = do_remove(node->right, expression, found);
-                }
-            } else {
-                node->right = do_remove(node->right, expression, found);
-                node->left = do_remove(node->left, expression, found);
             }
 
+            expression[file_name_size-1] = '*';
 
-        } else {
-            if (names_comparation == 0) {
-                *found = 1;
-                node = delete_node(node);
-            } else if (names_comparation < 0) {
-                node->right = do_remove(node->right, expression, found);
-            } else {
-                node->left = do_remove(node->left, expression, found);
+            // search on the whole tree
+            found |= do_remove(node->right, expression);
+            found |= do_remove(node->left, expression);
+
+            return found;
+        } else { // if it's looking for the exact file name
+            if (names_comparison == 0) { // if found
+                if (node->count > 0) {
+                    node->count = 0;
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+
+            if (names_comparison < 0) { // remove from the right
+                return do_remove(node->right, expression);
+            } else { // remove from the left
+                return do_remove(node->left, expression);
             }
         }
     }
-
-    return node;
 }
 
 char remove_from_tree(TreeAVL *tree, char expression[FILE_NAME_SIZE]) {
-    char found;
-    do_remove(tree->root, expression, &found);
-    return found;
+    return do_remove(tree->root, expression);
 }
 
-
-
+// companion recursive function to list
 char do_list(TreeAVLNode *node, char expression[FILE_NAME_SIZE]) {
     int names_comparation;
     int file_name_size;
     int i;
     char found = 0;
 
-    if (node == NULL) {
+    if (node == NULL) { // if the tree is empty
         return 0;
     } else{
         names_comparation = strcmp(node->file_name, expression);
         file_name_size = (int) strlen(expression);
 
-        if (expression[file_name_size-1] == '*') {
-            if (match(expression, node->file_name)) {
-                if (node->left != NULL && match(expression, node->left->file_name)){
-                    found |= do_list(node->left, expression);
-                }
+        if (expression[file_name_size-1] == '*') { // if it's an expression
+            found |= do_list(node->left, expression); // check the left tree first
 
+            expression[file_name_size-1] = '\0';
+
+            if (match(expression, node->file_name)) { // check if current node matches the expression
                 if (node->count > 0) {
-                    for (i = 0; i < node->count; i++) {
+                    for (i = 0; i < node->count; i++) { // print the corresponding count of files
                         printf("%s\n", node->file_name);
                     }
                     found = 1;
                 }
-
-                if (node->right != NULL && match(expression, node->right->file_name)){
-                    found |= do_list(node->right, expression);
-                }
-            } else {
-                found |= do_list(node->left, expression);
-                found |= do_list(node->right, expression);
             }
 
+            expression[file_name_size-1] = '*';
+
+            found |= do_list(node->right, expression); // check the right tree
+
             return found;
-        } else {
-            if (names_comparation == 0) {
+        } else { // if it's looking for an exact name
+            if (names_comparation == 0) { // if found the file
                 if (node->count > 0) {
                     for (i = 0; i < node->count; i++) {
                         printf("%s\n", node->file_name);
@@ -293,9 +251,11 @@ char do_list(TreeAVLNode *node, char expression[FILE_NAME_SIZE]) {
                 } else {
                     return 0;
                 }
-            } else if (names_comparation < 0) {
+            }
+
+            if (names_comparation < 0) { // if the file is on the right
                 return do_list(node->right, expression);
-            } else {
+            } else {// if the file is on the left
                 return do_list(node->left, expression);
             }
         }
