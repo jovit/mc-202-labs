@@ -2,12 +2,18 @@
 <module type="CPP_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/SplayTree.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/main.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TreeAVL.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Utils.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Ingredient.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Queue.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TreeAVL.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/SplayTree.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Utils.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Queue.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Ingredient.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Utils.h" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
