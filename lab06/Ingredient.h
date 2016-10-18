@@ -1,11 +1,13 @@
 #ifndef INGREDIENT_H
 #define INGREDIENT_H
 
+#define INGREDIENT_NAME_MAX_SIZE 100
+
 #define TIME_TO_UNFROZEN 2
 #define TIME_TO_STORE 5
 
 typedef struct Ingredient {
-    char *name;
+    char name[INGREDIENT_NAME_MAX_SIZE];
     int time_taken_out;
 } Ingredient;
 

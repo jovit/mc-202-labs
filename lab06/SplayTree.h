@@ -4,7 +4,7 @@
 #include "Queue.h"
 
 typedef struct SplayTreeNode {
-    char *ingredient_name;
+    char ingredient_name[INGREDIENT_NAME_MAX_SIZE];
     IngredientsQueue *ingredients_queue;
     struct SplayTreeNode *left, *right;
     int pizzas_waiting;
