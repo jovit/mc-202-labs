@@ -35,6 +35,7 @@ void add_to_order_list(OrderList *list, int order, IngredientList *ingredientLis
 
     new_node->order = order;
     new_node->ingredients = ingredientList;
+    new_node->next = NULL;
 
     if (list->first == NULL) { // if list is empty
         list->first = new_node;

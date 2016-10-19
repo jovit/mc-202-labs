@@ -34,6 +34,7 @@ void add_to_ingredient_list(IngredientList *list, Ingredient *value) {
     validate_malloc(new_node);
 
     new_node->value = value;
+    new_node->next = NULL;
 
     if (list->first == NULL) { // if list is empty
         list->first = new_node;

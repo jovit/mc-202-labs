@@ -68,5 +68,5 @@ void free_queue(IngredientsQueue *queue) {
 }
 
 Ingredient *peek_queue(IngredientsQueue *queue) {
-    return queue->root;
+    return queue->root->ingredient;
 }

@@ -2,6 +2,7 @@
 #include <string.h>
 #include "SplayTree.h"
 #include "Utils.h"
+#include "Queue.h"
 
 SplayTreeNode *new_splay_tree_node(char *ingredient_name) {
     SplayTreeNode *new_node = malloc(sizeof(SplayTreeNode));
@@ -33,17 +34,19 @@ SplayTree *create_splay_tree() {
 SplayTreeNode *rotate_to_right(SplayTreeNode *node) {
     SplayTreeNode *aux = node->left;
 
-    aux->right = node;
     node->left = aux->right;
+    aux->right = node;
+
 
     return aux;
 }
 
 SplayTreeNode *rotate_to_left(SplayTreeNode *node) {
-    SplayTreeNode *aux = node->left;
+    SplayTreeNode *aux = node->right;
 
-    aux->right = node;
-    node->left = aux->right;
+    node->right = aux->left;
+    aux->left = node;
+
 
     return aux;
 }
@@ -82,7 +85,7 @@ SplayTreeNode *splay(SplayTreeNode *root, char *ingredient_name) {
                 if (comparison == 0) { // Zig
                     root = rotate_to_right(root);
                 } else if (comparison < 0) { // Zag-Zig
-                    root->left->right = splay(root->right->right, ingredient_name); // bring value to right tree
+                    root->left->right = splay(root->left->right, ingredient_name); // bring value to right tree
                     root->left = root->left->right != NULL ? rotate_to_left(root->left) : root->left;
 
                     root = root->left != NULL ? rotate_to_right(root) : root;
@@ -155,7 +158,7 @@ char can_use_ingredient(SplayTree *tree, char *ingredient_name, int time) {
         insert_to_queue(ingredient_node->ingredients_queue, create_ingredient(ingredient_name, time));
         return 0;
     } else {
-        first_ingredient = peek_queue(ingredient_node->ingredients_queue);
+        first_ingredient = ingredient_node->ingredients_queue->root->ingredient;
         if (should_be_stored(first_ingredient, time) && ingredient_node->pizzas_waiting == 0) {
             remove_from_queue(ingredient_node->ingredients_queue);
             free(first_ingredient);
@@ -176,5 +179,35 @@ void use_ingredient(SplayTree *tree, char *ingredient_name, int time) {
     first_ingredient = remove_from_queue(ingredient_node->ingredients_queue);
     free(first_ingredient);
 
+    ingredient_node->pizzas_waiting--;
+
     insert_to_queue(ingredient_node->ingredients_queue, create_ingredient(ingredient_name, time));
+}
+
+char check_if_ingredient_is_done(SplayTree *tree, char *ingredient_name, int time) {
+    SplayTreeNode *ingredient_node;
+    Ingredient *first_ingredient;
+
+    ingredient_node = search(tree, ingredient_name);
+
+    if (is_queue_empty(ingredient_node->ingredients_queue)) {
+        return 0;
+    } else {
+        first_ingredient = ingredient_node->ingredients_queue->root->ingredient;
+        return is_unfrozen(first_ingredient, time);
+    }
+}
+
+void free_tree_node(SplayTreeNode *node) {
+    if (node != NULL) {
+        free_queue(node->ingredients_queue);
+        free_tree_node(node->left);
+        free_tree_node(node->right);
+        free(node);
+    }
+}
+
+void free_splay_tree(SplayTree *tree) {
+    free_tree_node(tree->root);
+    free(tree);
 }
