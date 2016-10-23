@@ -8,8 +8,8 @@ int main(void) {
     char can_prepare_pizza;
     int i;
     char ingredient_read[INGREDIENT_NAME_MAX_SIZE];
-    char char_read;
     OrderList *order_list;
+    OrderList *waiting_to_be_attended;
     IngredientList *ingredient_list;
     SplayTree *splay_tree;
     int last_time = 0;
@@ -19,22 +19,18 @@ int main(void) {
     IngredientListNode *current_ingredient_node;
 
     order_list = create_order_list();
+    waiting_to_be_attended = create_order_list();
     splay_tree = create_splay_tree();
 
-    //printf("oi");
-    // while hasn't finished reading values
-    while (scanf("%d%c", &current_time, &char_read) != EOF) {
-        if(char_read=='d') {
-            break;
-        }
 
+    while (scanf("%d", &current_time) == 1) {
         ingredient_list = create_ingredient_list();
 
-        while (char_read != '\n') {
-            scanf("%s", ingredient_read);
-            scanf("%c", &char_read);
+        while (scanf("%*[ ]%[^ \r\n]", ingredient_read) == 1) {
             add_to_ingredient_list(ingredient_list, create_ingredient(ingredient_read, 0));
         }
+
+        add_to_order_list(waiting_to_be_attended, current_ticket, ingredient_list);
 
         for (i = last_time + 1; i <= (current_time); i++) {
             if (in_the_oven) {
@@ -68,23 +64,31 @@ int main(void) {
         }
 
         can_prepare_pizza = 1;
-        for (current_ingredient_node = ingredient_list->first; current_ingredient_node != NULL;
-             current_ingredient_node = current_ingredient_node->next) {
-            if (!can_use_ingredient(splay_tree, current_ingredient_node->value->name, current_time)) {
-                can_prepare_pizza = 0;
-            }
-        }
+        if (!in_the_oven) {
 
-        if (can_prepare_pizza && !in_the_oven) {
-            for (current_ingredient_node = ingredient_list->first; current_ingredient_node != NULL;
-                 current_ingredient_node = current_ingredient_node->next) {
-                use_ingredient(splay_tree, current_ingredient_node->value->name, current_time);
-            }
-            in_the_oven = current_ticket;
-        } else {
-            add_to_order_list(order_list, current_ticket, ingredient_list);
-        }
+            while (waiting_to_be_attended->first != NULL) {
+                for (current_ingredient_node = waiting_to_be_attended->first->ingredients->first; current_ingredient_node != NULL;
+                     current_ingredient_node = current_ingredient_node->next) {
+                    if (!can_use_ingredient(splay_tree, current_ingredient_node->value->name, current_time)) {
+                        can_prepare_pizza = 0;
+                    }
+                }
 
+                if (can_prepare_pizza) {
+                    for (current_ingredient_node = waiting_to_be_attended->first->ingredients->first; current_ingredient_node != NULL;
+                         current_ingredient_node = current_ingredient_node->next) {
+                        use_ingredient(splay_tree, current_ingredient_node->value->name, current_time);
+                    }
+                    in_the_oven = waiting_to_be_attended->first->order;
+                    remove_order(waiting_to_be_attended, in_the_oven);
+                    break;
+                } else {
+                    add_to_order_list(order_list, waiting_to_be_attended->first->order, waiting_to_be_attended->first->ingredients);
+                    remove_order_without_ingredients(waiting_to_be_attended, waiting_to_be_attended->first->order);
+                }
+            }
+
+        }
 
         current_ticket++;
         last_time = current_time;
@@ -96,6 +100,7 @@ int main(void) {
             printf("%d ", in_the_oven);
             in_the_oven = 0;
         }
+
         for (current_order_node = order_list->first;
              current_order_node != NULL; current_order_node = current_order_node->next) {
             can_prepare_pizza = 1;
@@ -119,6 +124,33 @@ int main(void) {
                 break;
             }
         }
+
+        if (!in_the_oven) {
+
+            while (waiting_to_be_attended->first != NULL) {
+                for (current_ingredient_node = waiting_to_be_attended->first->ingredients->first; current_ingredient_node != NULL;
+                     current_ingredient_node = current_ingredient_node->next) {
+                    if (!can_use_ingredient(splay_tree, current_ingredient_node->value->name, current_time)) {
+                        can_prepare_pizza = 0;
+                    }
+                }
+
+                if (can_prepare_pizza) {
+                    for (current_ingredient_node = waiting_to_be_attended->first->ingredients->first; current_ingredient_node != NULL;
+                         current_ingredient_node = current_ingredient_node->next) {
+                        use_ingredient(splay_tree, current_ingredient_node->value->name, current_time);
+                    }
+                    in_the_oven = waiting_to_be_attended->first->order;
+                    remove_order(waiting_to_be_attended, in_the_oven);
+                    break;
+                } else {
+                    add_to_order_list(order_list, waiting_to_be_attended->first->order, waiting_to_be_attended->first->ingredients);
+                    remove_order_without_ingredients(waiting_to_be_attended, waiting_to_be_attended->first->order);
+                }
+            }
+
+        }
+
         i++;
     }
 
@@ -127,6 +159,7 @@ int main(void) {
     }
 
     free_order_list(order_list);
+    free_order_list(waiting_to_be_attended);
     free_splay_tree(splay_tree);
     return 0;
 }

@@ -156,6 +156,7 @@ char can_use_ingredient(SplayTree *tree, char *ingredient_name, int time) {
     if (is_queue_empty(ingredient_node->ingredients_queue)) {
         ingredient_node->pizzas_waiting++;
         insert_to_queue(ingredient_node->ingredients_queue, create_ingredient(ingredient_name, time));
+        insert_to_queue(ingredient_node->ingredients_queue, create_ingredient(ingredient_name, time));
         return 0;
     } else {
         first_ingredient = ingredient_node->ingredients_queue->root->ingredient;

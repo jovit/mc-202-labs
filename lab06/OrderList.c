@@ -73,8 +73,30 @@ void remove_order(OrderList *list, int order) {
             }
         }
     }
+}
 
 
+void remove_order_without_ingredients(OrderList *list, int order) {
+    OrderListNode *current_node;
+    OrderListNode *aux;
 
+    current_node = list->first;
+    if (list->first != NULL) {
+        if (list->first->order == order) {
+            aux = list->first;
+            list->first = list->first->next;
+            free(aux);
+        } else {
+            while (current_node->next != NULL) { // find last node from list
+                if (current_node->next->order == order) {
+                    aux = current_node->next;
+                    current_node->next = aux->next;
+                    free(aux);
+                    break;
+                }
+                current_node = current_node->next;
+            }
+        }
+    }
 }
 
