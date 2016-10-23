@@ -30,8 +30,6 @@ int main(void) {
             add_to_ingredient_list(ingredient_list, create_ingredient(ingredient_read, 0));
         }
 
-        add_to_order_list(waiting_to_be_attended, current_ticket, ingredient_list);
-
         for (i = last_time + 1; i <= (current_time); i++) {
             if (in_the_oven) {
                 printf("%d ", in_the_oven);
@@ -61,12 +59,39 @@ int main(void) {
                 }
             }
 
+            if (!in_the_oven) {
+
+                while (waiting_to_be_attended->first != NULL) {
+                    can_prepare_pizza = 1;
+                    for (current_ingredient_node = waiting_to_be_attended->first->ingredients->first; current_ingredient_node != NULL;
+                         current_ingredient_node = current_ingredient_node->next) {
+                        if (!can_use_ingredient(splay_tree, current_ingredient_node->value->name, i)) {
+                            can_prepare_pizza = 0;
+                        }
+                    }
+
+                    if (can_prepare_pizza) {
+                        for (current_ingredient_node = waiting_to_be_attended->first->ingredients->first; current_ingredient_node != NULL;
+                             current_ingredient_node = current_ingredient_node->next) {
+                            use_ingredient(splay_tree, current_ingredient_node->value->name, i);
+                        }
+                        in_the_oven = waiting_to_be_attended->first->order;
+                        remove_order(waiting_to_be_attended, in_the_oven);
+                        break;
+                    } else {
+                        add_to_order_list(order_list, waiting_to_be_attended->first->order, waiting_to_be_attended->first->ingredients);
+                        remove_order_without_ingredients(waiting_to_be_attended, waiting_to_be_attended->first->order);
+                    }
+                }
+
+            }
         }
 
-        can_prepare_pizza = 1;
+        add_to_order_list(waiting_to_be_attended, current_ticket, ingredient_list);
         if (!in_the_oven) {
 
             while (waiting_to_be_attended->first != NULL) {
+                can_prepare_pizza = 1;
                 for (current_ingredient_node = waiting_to_be_attended->first->ingredients->first; current_ingredient_node != NULL;
                      current_ingredient_node = current_ingredient_node->next) {
                     if (!can_use_ingredient(splay_tree, current_ingredient_node->value->name, current_time)) {
@@ -90,12 +115,13 @@ int main(void) {
 
         }
 
+
         current_ticket++;
         last_time = current_time;
     }
 
     i = current_time + 1;
-    while (order_list->first != NULL) {
+    while (order_list->first != NULL || waiting_to_be_attended->first != NULL) {
         if (in_the_oven) {
             printf("%d ", in_the_oven);
             in_the_oven = 0;
@@ -126,11 +152,11 @@ int main(void) {
         }
 
         if (!in_the_oven) {
-
             while (waiting_to_be_attended->first != NULL) {
+                can_prepare_pizza = 1;
                 for (current_ingredient_node = waiting_to_be_attended->first->ingredients->first; current_ingredient_node != NULL;
                      current_ingredient_node = current_ingredient_node->next) {
-                    if (!can_use_ingredient(splay_tree, current_ingredient_node->value->name, current_time)) {
+                    if (!can_use_ingredient(splay_tree, current_ingredient_node->value->name, i)) {
                         can_prepare_pizza = 0;
                     }
                 }
@@ -138,7 +164,7 @@ int main(void) {
                 if (can_prepare_pizza) {
                     for (current_ingredient_node = waiting_to_be_attended->first->ingredients->first; current_ingredient_node != NULL;
                          current_ingredient_node = current_ingredient_node->next) {
-                        use_ingredient(splay_tree, current_ingredient_node->value->name, current_time);
+                        use_ingredient(splay_tree, current_ingredient_node->value->name, i);
                     }
                     in_the_oven = waiting_to_be_attended->first->order;
                     remove_order(waiting_to_be_attended, in_the_oven);
@@ -155,7 +181,7 @@ int main(void) {
     }
 
     if (in_the_oven) {
-        printf("%d", in_the_oven);
+        printf("%d ", in_the_oven);
     }
 
     free_order_list(order_list);

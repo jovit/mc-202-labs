@@ -162,11 +162,23 @@ char can_use_ingredient(SplayTree *tree, char *ingredient_name, int time) {
         first_ingredient = ingredient_node->ingredients_queue->root->ingredient;
         if (should_be_stored(first_ingredient, time) && ingredient_node->pizzas_waiting == 0) {
             remove_from_queue(ingredient_node->ingredients_queue);
-            free(first_ingredient);
+            if (should_be_stored(ingredient_node->ingredients_queue->root->ingredient, time)) {
+                free(first_ingredient);
+                first_ingredient = ingredient_node->ingredients_queue->root->ingredient;
+                remove_from_queue(ingredient_node->ingredients_queue);
+                free(first_ingredient);
+            } else {
+                insert_to_queue(ingredient_node->ingredients_queue, first_ingredient);
+            }
+
             return can_use_ingredient(tree, ingredient_name, time);
         } else {
             ingredient_node->pizzas_waiting++;
-            return is_unfrozen(first_ingredient, time);
+            if (first_ingredient->time_taken_out > ingredient_node->ingredients_queue->root->next->ingredient->time_taken_out) {
+                remove_from_queue(ingredient_node->ingredients_queue);
+                insert_to_queue(ingredient_node->ingredients_queue, first_ingredient);
+            }
+            return is_unfrozen(ingredient_node->ingredients_queue->root->ingredient, time);
         }
     }
 }
