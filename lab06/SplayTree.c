@@ -2,7 +2,6 @@
 #include <string.h>
 #include "SplayTree.h"
 #include "Utils.h"
-#include "Queue.h"
 
 SplayTreeNode *new_splay_tree_node(char *ingredient_name) {
     SplayTreeNode *new_node = malloc(sizeof(SplayTreeNode));
@@ -118,26 +117,37 @@ SplayTreeNode *search(SplayTree *tree, char *ingredient_name) {
     return NULL;
 }
 
-SplayTreeNode *do_insert(SplayTreeNode *current_node, char *ingredient_name) {
+void insert(SplayTree *tree, char *ingredient_name) {
+    SplayTreeNode *current_node = tree->root;
     int comparison;
 
-    if (current_node == NULL) {
-        return new_splay_tree_node(ingredient_name);
+    if (!current_node) {
+        tree->root = new_splay_tree_node(ingredient_name);
+    } else {
+        while (1) {
+            comparison = strcmp(current_node->ingredient_name, ingredient_name);
+
+            if (comparison < 0) {
+                if (current_node->right != NULL) {
+                    current_node = current_node->right;
+                } else {
+                    current_node->right = new_splay_tree_node(ingredient_name);
+                    break;
+                }
+            } else if (comparison > 0){
+                if (current_node->left != NULL) {
+                    current_node = current_node->left;
+                } else {
+                    current_node->left = new_splay_tree_node(ingredient_name);
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+
     }
 
-    comparison = strcmp(current_node->ingredient_name, ingredient_name);
-
-    if (comparison < 0) {
-        current_node->right = do_insert(current_node->right, ingredient_name);
-    } else if (comparison > 0) {
-        current_node->left = do_insert(current_node->left, ingredient_name);
-    }
-
-    return current_node;
-}
-
-void insert(SplayTree *tree, char *ingredient_name) {
-    tree->root = do_insert(tree->root, ingredient_name);
     tree->root = splay(tree->root, ingredient_name);
 }
 
