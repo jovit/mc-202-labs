@@ -28,7 +28,6 @@ void free_order_list(OrderList *list) {
 }
 
 void add_to_order_list(OrderList *list, int order, IngredientList *ingredientList) {
-    OrderListNode *current_node;
     OrderListNode *new_node = malloc(sizeof(OrderListNode));
 
     validate_malloc(new_node);
@@ -39,13 +38,10 @@ void add_to_order_list(OrderList *list, int order, IngredientList *ingredientLis
 
     if (list->first == NULL) { // if list is empty
         list->first = new_node;
+        list->last = new_node;
     } else {
-        current_node = list->first;
-
-        while (current_node->next != NULL) { // find last node from list
-            current_node = current_node->next;
-        }
-        current_node->next = new_node; // put new value in the end of the list
+        list->last->next = new_node; // put new value in the end of the list
+        list->last = new_node;
     }
 }
 

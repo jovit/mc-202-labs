@@ -1,5 +1,6 @@
 all:
-	gcc *.c -o main -Wall -Werror -pedantic -std=c99
-
+	gcc -std=c99 -pedantic -Wall *.c -o main -O3 -w
 run:
 	./main
+clean:
+	rm main

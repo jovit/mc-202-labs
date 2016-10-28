@@ -12,6 +12,7 @@ typedef struct OrderListNode {
 
 typedef struct OrderList {
     OrderListNode *first;
+    OrderListNode *last;
 } OrderList;
 
 OrderList* create_order_list(); // allocates a new list
