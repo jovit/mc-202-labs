@@ -6,9 +6,9 @@ typedef struct {
 } HeapNode;
 typedef struct {
     HeapNode *nodes;
-    int size;
+    int size, capacity;
 } Heap;
 #endif
 
-Heap *create_empty_heap(int size);
-Heap *create_heap_from_array();
+Heap *create_empty_heap(int capacity);
+void free_heap(Heap *heap);
