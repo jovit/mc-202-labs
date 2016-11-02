@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include "Utils.h"
 #include "Heap.h"
-#include "IntList.h"
 
 int find_next_occurrence(int *array, int size, int start, int value) {
     int i;
@@ -16,32 +15,24 @@ int find_next_occurrence(int *array, int size, int start, int value) {
     return i;
 }
 
-long hash(int i) {
-    return i*2654435761 % 4294967296;
+void add_to_cache(char *cache, int key) {
+    cache[key] = 1;
 }
 
-void add_to_cache(IntList **cache, int cache_size, int key) {
-    long position = hash(key) % cache_size;
-    add_to_list(cache[position], key);
+char contain_in_cache(char *cache, int key) {
+    return cache[key];
 }
 
-char contain_in_cache(IntList **cache, int cache_size, int key) {
-    long position = hash(key) % cache_size;
-    return list_contains(cache[position], key);
-}
-
-void remove_from_cache(IntList **cache, int cache_size, int key) {
-    long position = hash(key) % cache_size;
-    remove_from_list(cache[position], key);
+void remove_from_cache(char *cache, int key) {
+    cache[key] = 0;
 }
 
 int main(void) {
     int cache_size, number_of_elements, number_of_accesses;
-    int cache_hash_table_size;
     int i;
     int value_read;
     int *accesses;
-    IntList **cache;
+    char *cache;
     HeapNode node;
     Heap *priority_queue;
     int cache_switch_count = 0;
@@ -49,12 +40,10 @@ int main(void) {
 
     scanf("%d %d %d", &cache_size, &number_of_elements, &number_of_accesses);
 
-    cache = malloc(sizeof(IntList*) * number_of_elements);
+    cache = malloc(sizeof(char) * number_of_elements);
 
-    cache_hash_table_size = number_of_elements;
-
-    for (i = 0; i < cache_hash_table_size; i++) {
-        cache[i] = create_list();
+    for (i = 0; i < number_of_elements; i++) {
+        cache[i] = 0;
     }
 
     priority_queue = create_heap(cache_size);
@@ -71,16 +60,16 @@ int main(void) {
         printf("%d", cache_size);
     } else {
         for (i = 0; i < number_of_accesses; i++) {
-            if (!contain_in_cache(cache, cache_hash_table_size, accesses[i])){
+            if (!contain_in_cache(cache, accesses[i])){
                 if (values_in_cache < cache_size) {
                     values_in_cache++;
-                    add_to_cache(cache, cache_hash_table_size, accesses[i]);
+                    add_to_cache(cache, accesses[i]);
                     node.key = find_next_occurrence(accesses, number_of_accesses, i+1, accesses[i]);
                     node.value = accesses[i];
                     insert(priority_queue, node);
                 } else {
-                    remove_from_cache(cache, cache_hash_table_size, remove_max(priority_queue).value);
-                    add_to_cache(cache, cache_hash_table_size, accesses[i]);
+                    remove_from_cache(cache, remove_max(priority_queue).value);
+                    add_to_cache(cache, accesses[i]);
                     node.key = find_next_occurrence(accesses, number_of_accesses, i+1, accesses[i]);
                     node.value = accesses[i];
                     insert(priority_queue, node);
@@ -97,9 +86,6 @@ int main(void) {
 
     free(accesses);
     free_heap(priority_queue);
-    for (i = 0; i < number_of_elements; i++) {
-        free_list(cache[i]);
-    }
     free(cache);
 
     return 0;
