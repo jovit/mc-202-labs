@@ -52,10 +52,6 @@ void heapfy(Heap *heap, int i) {
     }
 }
 
-HeapNode increasePriority(Heap *heap, int i) {
-
-}
-
 HeapNode remove_max(Heap *heap) {
     HeapNode max = heap->nodes[0];
     heap->nodes[0] = heap->nodes[heap->size-1];
