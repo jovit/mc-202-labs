@@ -123,5 +123,5 @@ void set_priority(Heap *heap, int value, int new_key) {
 }
 
 int get_max(Heap *heap) {
-    return heap->nodes[0].value;
+    return heap->nodes[0].key;
 }

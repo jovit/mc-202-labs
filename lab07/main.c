@@ -4,11 +4,11 @@
 #include "Heap.h"
 #include "IntList.h"
 
-int find_next_occurrence(int *array, int size, int start, int value, int max_value) {
+int find_next_occurrence(int *array, int size, int start, int value) {
     int i;
 
     for (i = start; i < size; i++) {
-        if (array[i] == value || i > max_value) {
+        if (array[i] == value) {
             break;
         }
     }
@@ -20,17 +20,17 @@ long hash(int i) {
     return i*2654435761 % 4294967296;
 }
 
-int add_to_cache(IntList **cache, int cache_size, int key) {
+void add_to_cache(IntList **cache, int cache_size, int key) {
     long position = hash(key) % cache_size;
     add_to_list(cache[position], key);
 }
 
 char contain_in_cache(IntList **cache, int cache_size, int key) {
     long position = hash(key) % cache_size;
-    list_contains(cache[position], key);
+    return list_contains(cache[position], key);
 }
 
-int remove_from_cache(IntList **cache, int cache_size, int key) {
+void remove_from_cache(IntList **cache, int cache_size, int key) {
     long position = hash(key) % cache_size;
     remove_from_list(cache[position], key);
 }
@@ -75,23 +75,20 @@ int main(void) {
                 if (values_in_cache < cache_size) {
                     values_in_cache++;
                     add_to_cache(cache, cache_hash_table_size, accesses[i]);
-                    node.key = find_next_occurrence(accesses, number_of_accesses, i+1, accesses[i],
-                                                    priority_queue->size > 0 ? get_max(priority_queue) : number_of_accesses);
+                    node.key = find_next_occurrence(accesses, number_of_accesses, i+1, accesses[i]);
                     node.value = accesses[i];
                     insert(priority_queue, node);
                 } else {
                     remove_from_cache(cache, cache_hash_table_size, remove_max(priority_queue).value);
                     add_to_cache(cache, cache_hash_table_size, accesses[i]);
-                    node.key = find_next_occurrence(accesses, number_of_accesses, i+1, accesses[i],
-                                                    priority_queue->size > 0 ? get_max(priority_queue) : number_of_accesses);
+                    node.key = find_next_occurrence(accesses, number_of_accesses, i+1, accesses[i]);
                     node.value = accesses[i];
                     insert(priority_queue, node);
                 }
 
                 cache_switch_count++;
             } else {
-                set_priority(priority_queue, accesses[i], find_next_occurrence(accesses, number_of_accesses, i+1, accesses[i],
-                                                                               priority_queue->size > 0 ? get_max(priority_queue) : number_of_accesses));
+                set_priority(priority_queue, accesses[i], find_next_occurrence(accesses, number_of_accesses, i+1, accesses[i]));
             }
         }
     }
