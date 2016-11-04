@@ -10,11 +10,8 @@ typedef struct {
 } Heap;
 #endif
 
-Heap *create_heap_from_array(int capacity, HeapNode *nodes);
 HeapNode remove_max(Heap *heap);
-int get_max(Heap *heap);
 Heap *create_heap(int capacity);
 void set_priority(Heap *heap, int value, int new_key);
 void insert(Heap *heap, HeapNode value);
-char is_empty(Heap *heap);
 void free_heap(Heap *heap);
