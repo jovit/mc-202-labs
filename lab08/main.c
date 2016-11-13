@@ -1,5 +1,3 @@
-
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -25,6 +23,4 @@ int main(void) {
         scanf("%s", word_read);
         hashed_text[i] = hash(word_read);
     }
-
-    return 0;
 }
