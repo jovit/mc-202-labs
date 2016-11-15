@@ -155,5 +155,17 @@ int do_get_count(TreeAVLNode *node, long key) {
 }
 
 int get_count(TreeAVL *tree, long key) {
-    return 0;
+    return do_get_count(tree->root, key);
+}
+
+int do_get_total_count(TreeAVLNode *node) {
+    if (node == NULL) {
+        return 0;
+    }
+
+    return do_get_total_count(node->left) + do_get_total_count(node->right) + node->count;
+}
+
+int get_total_count(TreeAVL *tree) {
+    return do_get_total_count(tree->root);
 }

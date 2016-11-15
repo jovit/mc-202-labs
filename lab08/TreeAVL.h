@@ -16,6 +16,7 @@ typedef struct {
 TreeAVL *create_tree();
 void insert_to_tree(TreeAVL *tree, long key);
 int get_count(TreeAVL *tree, long key);
+int get_total_count(TreeAVL *tree);
 void free_tree(TreeAVL* tree);
 
 #endif

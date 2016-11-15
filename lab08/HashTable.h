@@ -3,13 +3,20 @@
 
 #include "IntList.h"
 
+typedef struct HashTableValue {
+    IntList *indexes;
+    long key;
+    struct HashTableValue *next;
+} HashTableValue;
+
 typedef struct {
-    int size;
-    IntList **values;
+    long size;
+    HashTableValue **values;
 } HashTable;
 
-HashTable *create_hash_table(int size);
-void add_to_hash_table(HashTable *table, int value, long key);
+HashTable *create_hash_table(long size);
+void add_to_hash_table(HashTable *table, int value, unsigned long key);
+IntList *get_key(HashTable *table, unsigned long key);
 void free_hash_table(HashTable *table);
 
 #endif
