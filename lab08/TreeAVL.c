@@ -107,7 +107,7 @@ TreeAVLNode *do_add(TreeAVLNode *node, long key) {
     if (node == NULL) { // empty tree
         return new_node(key);
     } else {
-        if (node->key == key) { // repeated file name
+        if (node->key == key) { // repeated key
             node->count++;
         } else if (node->key > key) { // add in the left
             node->left = do_add(node->left, key);

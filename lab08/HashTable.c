@@ -13,6 +13,7 @@ HashTableValue *create_hash_table_value(unsigned long key) {
     return value;
 }
 
+// initialize a empty hash table
 HashTable *create_hash_table(long size) {
     HashTable *table = malloc(sizeof(HashTable));
     long i;
@@ -35,8 +36,9 @@ void free_hash_table(HashTable *table) {
     int i;
     HashTableValue *current;
 
+    // free all nodes from table
     for (i = 0; i < table->size; i++) {
-        if (table->values[i]) {
+        if (table->values[i]) { // free the list
             current = table->values[i];
 
             while (current) {
@@ -57,17 +59,17 @@ void add_to_hash_table(HashTable *table, int value, unsigned long key) {
     HashTableValue *current_value;
     unsigned long index = key % table->size;
 
-    if (!table->values[index]) {
+    if (!table->values[index]) { // if there's no existing key in index
         table->values[index] = create_hash_table_value(key);
         add_to_start(table->values[index]->indexes, value);
     } else {
         current_value = table->values[index];
 
-        while (current_value->next != NULL && current_value->key != key) {
+        while (current_value->next != NULL && current_value->key != key) { // looks for the key in case of collision
             current_value = current_value->next;
         }
 
-        if (current_value->key != key) {
+        if (current_value->key != key) { // did not find the key
             current_value->next = create_hash_table_value(key);
             current_value = current_value->next;
         }
@@ -78,13 +80,14 @@ void add_to_hash_table(HashTable *table, int value, unsigned long key) {
 
 }
 
+// get the list of index of a word with matching key
 IntList *get_key(HashTable *table, unsigned long key) {
     HashTableValue *current_value;
     unsigned long index = key % table->size;
 
     current_value = table->values[index];
 
-    while (current_value->key != key) {
+    while (current_value->key != key) { // find the key
         current_value = current_value->next;
     }
 
