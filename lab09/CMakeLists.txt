@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.6)
-project(lab08)
+project(lab09)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c")
 
-set(SOURCE_FILES main.c Utils.c Utils.h TreeAVL.c TreeAVL.h HashTable.c HashTable.h IntList.c IntList.h)
+set(SOURCE_FILES main.c Utils.c Utils.h main.c HashTable.c HashTable.h IntList.c IntList.h)
 
-add_executable(lab08 ${SOURCE_FILES})
+add_executable(lab09 ${SOURCE_FILES})
