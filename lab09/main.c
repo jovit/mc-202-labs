@@ -1,8 +1,7 @@
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "HashTable.h"
 
 #define WHITE 0xFFFFFF
 
@@ -37,6 +36,28 @@ void free_image(Image *img) {
         free(img->pixels[i]);
     free(img->pixels);
     free(img);
+}
+
+unsigned long hash_pixel(int color, int x, int y) {
+    unsigned long hash;
+
+    hash = (unsigned long) color;
+    hash = hash * 31 + x;
+    hash = hash * 31 + y;
+
+    return hash;
+}
+
+HashTable *generate_graph(Image *image) {
+    int i, j;
+    HashTable *graph = create_hash_table(image->height * image->height);
+
+    for (i = 0; i < image->width; i++) {
+        for (j = 0; j < image->height; j++) {
+
+        }
+    }
+
 }
 
 int main(void) {

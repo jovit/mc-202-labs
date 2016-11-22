@@ -3,6 +3,6 @@ project(lab09)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c")
 
-set(SOURCE_FILES main.c Utils.c Utils.h main.c HashTable.c HashTable.h IntList.c IntList.h)
+set(SOURCE_FILES main.c Utils.c Utils.h main.c HashTable.c HashTable.h IntList.c IntList.h TreeAVL.h TreeAVL.c)
 
 add_executable(lab09 ${SOURCE_FILES})

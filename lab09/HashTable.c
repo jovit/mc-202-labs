@@ -3,11 +3,11 @@
 #include "HashTable.h"
 #include "Utils.h"
 
-HashTableValue *create_hash_table_value(unsigned long key) {
+HashTableValue *create_hash_table_value(int color) {
     HashTableValue *value = malloc(sizeof(HashTableValue));
 
-    value->indexes = create_list();
-    value->key = key;
+    value->pixels = create_tree();
+    value->color = color;
     value->next = NULL;
 
     return value;
@@ -42,7 +42,7 @@ void free_hash_table(HashTable *table) {
             current = table->values[i];
 
             while (current) {
-                free_list(table->values[i]->indexes);
+                free_list(table->values[i]->pixels);
                 table->values[i] = current->next;
                 free(current);
                 current = table->values[i];
@@ -55,41 +55,28 @@ void free_hash_table(HashTable *table) {
     free(table);
 }
 
-void add_to_hash_table(HashTable *table, int value, unsigned long key) {
+void add_to_hash_table(HashTable *table, int color, unsigned long *another_pixel_key, unsigned long key) {
     HashTableValue *current_value;
-    unsigned long index = key % table->size;
+    unsigned long index = (unsigned long) color % table->size;
 
     if (!table->values[index]) { // if there's no existing key in index
-        table->values[index] = create_hash_table_value(key);
-        add_to_start(table->values[index]->indexes, value);
-    } else {
+        table->values[index] = create_hash_table_value(color);
+        insert_to_tree(table->values[index]->pixels, key);
+    } else if (another_pixel_key) {
         current_value = table->values[index];
 
-        while (current_value->next != NULL && current_value->key != key) { // looks for the key in case of collision
+        while (current_value->next != NULL && !contains(current_value->pixels, *another_pixel_key)) { // looks for the key in case of collision
             current_value = current_value->next;
         }
 
-        if (current_value->key != key) { // did not find the key
-            current_value->next = create_hash_table_value(key);
-            current_value = current_value->next;
-        }
+        insert_to_tree(current_value->pixels, key);
+    } else {
+        current_value = create_hash_table_value(color);
+        current_value->next = table->values[index];
+        table->values[index] = current_value->next;
 
-        add_to_start(current_value->indexes, value);
+        insert_to_tree(current_value->pixels, key);
     }
 
 
-}
-
-// get the list of index of a word with matching key
-IntList *get_key(HashTable *table, unsigned long key) {
-    HashTableValue *current_value;
-    unsigned long index = key % table->size;
-
-    current_value = table->values[index];
-
-    while (current_value->key != key) { // find the key
-        current_value = current_value->next;
-    }
-
-    return current_value->indexes;
 }

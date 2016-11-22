@@ -2,10 +2,11 @@
 #define HASHTABLE_H
 
 #include "IntList.h"
+#include "TreeAVL.h"
 
 typedef struct HashTableValue {
-    IntList *indexes;
-    long key;
+    TreeAVL *pixels;
+    int color;
     struct HashTableValue *next;
 } HashTableValue;
 
@@ -15,8 +16,7 @@ typedef struct {
 } HashTable;
 
 HashTable *create_hash_table(long size);
-void add_to_hash_table(HashTable *table, int value, unsigned long key);
-IntList *get_key(HashTable *table, unsigned long key);
+void add_to_hash_table(HashTable *table, int color, unsigned long *another_pixel_key, unsigned long key);
 void free_hash_table(HashTable *table);
 
 #endif
