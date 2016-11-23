@@ -17,6 +17,7 @@ typedef struct {
 
 HashTable *create_hash_table(long size);
 void add_to_hash_table(HashTable *table, int color, unsigned long *another_pixel_key, unsigned long key);
+char contains_pixel(HashTable *table, int color, unsigned long key);
 void free_hash_table(HashTable *table);
 
 #endif

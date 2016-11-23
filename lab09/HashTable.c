@@ -42,7 +42,7 @@ void free_hash_table(HashTable *table) {
             current = table->values[i];
 
             while (current) {
-                free_list(table->values[i]->pixels);
+                free_tree(table->values[i]->pixels);
                 table->values[i] = current->next;
                 free(current);
                 current = table->values[i];
@@ -54,7 +54,7 @@ void free_hash_table(HashTable *table) {
     free(table->values);
     free(table);
 }
-
+//falta padrão, muito complicado
 void add_to_hash_table(HashTable *table, int color, unsigned long *another_pixel_key, unsigned long key) {
     HashTableValue *current_value;
     unsigned long index = (unsigned long) color % table->size;
@@ -65,11 +65,19 @@ void add_to_hash_table(HashTable *table, int color, unsigned long *another_pixel
     } else if (another_pixel_key) {
         current_value = table->values[index];
 
-        while (current_value->next != NULL && !contains(current_value->pixels, *another_pixel_key)) { // looks for the key in case of collision
+        while (current_value != NULL && !contains(current_value->pixels, *another_pixel_key)) { // looks for the key in case of collision
             current_value = current_value->next;
         }
 
-        insert_to_tree(current_value->pixels, key);
+        if (current_value != NULL) {
+            insert_to_tree(current_value->pixels, key);
+        } else {
+            current_value = create_hash_table_value(color);
+            current_value->next = table->values[index];
+            table->values[index] = current_value->next;
+
+            insert_to_tree(current_value->pixels, key);
+        }
     } else {
         current_value = create_hash_table_value(color);
         current_value->next = table->values[index];
@@ -79,4 +87,21 @@ void add_to_hash_table(HashTable *table, int color, unsigned long *another_pixel
     }
 
 
+}
+
+char contains_pixel(HashTable *table, int color, unsigned long key) {
+    HashTableValue *current_value;
+    unsigned long index = (unsigned long) color % table->size;
+
+    current_value = table->values[index];
+    if (current_value) {
+        while (current_value != NULL &&
+               !contains(current_value->pixels, key)) {
+            current_value = current_value->next;
+        }
+
+        return current_value != NULL;
+    } else {
+        return 0;
+    }
 }
