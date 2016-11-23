@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <limits.h>
-#include "HashTable.h"
+#include "Heap.h"
 
 #define WHITE 0xFFFFFF
 
 typedef struct {
     int width, height;
     int **pixels;
+    char **has_searched;
+    int white_x, white_y;
 } Image;
 
 Image *read_image() {
@@ -21,11 +22,18 @@ Image *read_image() {
     ungetc(peek,stdin);
     assert(scanf("%d %d %*d", &img->width, &img->height)==2);
     assert(img->pixels = malloc(sizeof(*img->pixels) * img->height));
+    assert(img->has_searched = malloc(sizeof(*img->has_searched) * img->height));
     for (i = 0; i < img->height; i++) {
         assert(img->pixels[i] = malloc(sizeof(**img->pixels) * img->width));
+        assert(img->has_searched[i] = malloc(sizeof(**img->has_searched) * img->width));
         for (j = 0; j < img->width; j++) {
             assert(scanf("%d%d%d", &r, &g, &b)==3);
             img->pixels[i][j] = (r << 16) + (g << 8) + b;
+            img->has_searched[i][j] = 0;
+            if (img->pixels[i][j] == WHITE) {
+                img->white_x = j;
+                img->white_y = i;
+            }
         }
     }
     return img;
@@ -33,67 +41,96 @@ Image *read_image() {
 
 void free_image(Image *img) {
     int i;
-    for (i = 0; i < img->height; i++)
+    for (i = 0; i < img->height; i++) {
         free(img->pixels[i]);
+        free(img->has_searched[i]);
+    }
+
     free(img->pixels);
+    free(img->has_searched);
     free(img);
 }
 
-unsigned long hash_pixel(int color, int x, int y) {
-    unsigned long hash;
-
-    hash = (unsigned long) color;
-    hash = hash * 31 + x;
-    hash = hash * 31 + y;
-
-    return hash;
-}
-
-void flood_insert(HashTable *graph, int **pixels, int color, int width, int height, unsigned long *inital_pixel_key, int currentX, int currentY) {
-
-    if ( currentX >= 0 && currentY >= 0 && currentX < width
-         && currentY < height && pixels[currentY][currentX] != INT_MAX && pixels[currentY][currentX] == color) {
-        add_to_hash_table(graph, color, inital_pixel_key, hash_pixel(color, currentX, currentY));
-        pixels[currentY][currentX] = INT_MAX;
-
-        printf("%d %d\n", currentX, currentY);
-
-        flood_insert(graph, pixels, color, width, height, inital_pixel_key, currentX+1, currentY);
-        flood_insert(graph, pixels, color, width, height, inital_pixel_key, currentX-1, currentY);
-        flood_insert(graph, pixels, color, width, height, inital_pixel_key, currentX, currentY+1);
-        flood_insert(graph, pixels, color, width, height, inital_pixel_key, currentX, currentY-1);
-    }
-}
-
-HashTable *generate_graph(Image *image) {
-    int i, j;
-    unsigned long *another_key;
-    HashTable *graph = create_hash_table(image->height * image->height);
-
-    for (i = 0; i < image->height; i++) {
-        for (j = 0; j < image->width; j++) {
-            if (image->pixels[i][j] != INT_MAX) {
-                another_key = malloc(sizeof(unsigned long));
-                *another_key = hash_pixel(image->pixels[i][j], i, j);
-                flood_insert(graph, image->pixels, image->pixels[i][j], image->width, image->height, another_key, j, i);
-                free(another_key);
-            }
-        }
-
-    }
-
-    return graph;
-}
 
 int main(void) {
-    HashTable *graph;
+    Heap *queue;
+    HeapNode heap_node;
+    int current_distance;
+    int current_x, current_y;
 
     Image *img = read_image();
 
-    graph = generate_graph(img);
+    queue = create_heap(img->height * img->width);
+
+    heap_node.key = 0;
+    heap_node.x = img->white_x;
+    heap_node.y = img->white_y;
+    insert(queue, heap_node);
+
+    while (queue->size > 0) {
+        heap_node = remove_min(queue);
+        current_x = heap_node.x;
+        current_y = heap_node.y;
+        current_distance = heap_node.key;
+
+        img->has_searched[current_y][current_x] = 1;
+
+        if (current_x > 0 && !img->has_searched[current_y][current_x - 1]) {
+            heap_node.x = current_x - 1;
+            heap_node.y = current_y;
+            heap_node.key = current_distance;
+
+            if (img->pixels[heap_node.y][heap_node.x] != img->pixels[current_y][current_x]) {
+                heap_node.key += 1;
+            }
+
+            insert(queue, heap_node);
+        }
+
+        if (current_x < img->width - 1 && !img->has_searched[current_y][current_x + 1]) {
+            heap_node.x = current_x + 1;
+            heap_node.y = current_y;
+            heap_node.key = current_distance;
+
+            if (img->pixels[heap_node.y][heap_node.x] != img->pixels[current_y][current_x]) {
+                heap_node.key += 1;
+            }
+
+            insert(queue, heap_node);
+        }
+
+        if (current_y > 0 && !img->has_searched[current_y - 1][current_x]) {
+            heap_node.x = current_x ;
+            heap_node.y = current_y - 1;
+            heap_node.key = current_distance;
+
+            if (img->pixels[heap_node.y][heap_node.x] != img->pixels[current_y][current_x]) {
+                heap_node.key += 1;
+            }
+
+            insert(queue, heap_node);
+        }
+
+        if (current_y < img->height - 1 && !img->has_searched[current_y + 1][current_x]) {
+            heap_node.x = current_x;
+            heap_node.y = current_y + 1;
+            heap_node.key = current_distance;
+
+            if (img->pixels[heap_node.y][heap_node.x] != img->pixels[current_y][current_x]) {
+                heap_node.key += 1;
+            }
+
+            insert(queue, heap_node);
+        }
+
+        if (img->pixels[current_y][current_x] == WHITE && current_distance > 0) {
+            printf("Maria deve memorizar %d regioes.", current_distance - 1);
+            break;
+        }
+    }
 
     free_image(img);
-    free_hash_table(graph);
+    free_heap(queue);
 
     return 0;
 }
