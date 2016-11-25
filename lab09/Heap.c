@@ -30,7 +30,7 @@ void swap(HeapNode *x, HeapNode *y) {
     *y = aux;
 }
 
-// insert to max heap
+// insert to min heap
 void insert(Heap *heap, HeapNode value) {
     int i;
     if (heap->size < heap->capacity) { // if heap not full
