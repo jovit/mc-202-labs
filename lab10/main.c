@@ -16,12 +16,12 @@ int main(void) {
     int number_of_distinct_words, weight, number_of_phrases;
     int number_of_words_in_phrase;
     int i, j;
-    HashTable *hashTable;
+    HashTable *hash_table;
     char word_read[WORD_MAX_SIZE];
 
     scanf("%d %d %d", &number_of_distinct_words, &weight, &number_of_phrases);
 
-    hashTable = create_hash_table(number_of_distinct_words * 2);
+    hash_table = create_hash_table(number_of_distinct_words * 2);
 
     for (i = 0; i < number_of_phrases; i++) {
         scanf("%d", &number_of_words_in_phrase);
@@ -30,6 +30,8 @@ int main(void) {
             scanf(" %s", word_read);
         }
     }
+
+    free_hash_table(hash_table);
 
     return 0;
 }

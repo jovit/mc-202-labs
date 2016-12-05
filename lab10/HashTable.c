@@ -55,13 +55,12 @@ void free_hash_table(HashTable *table) {
     free(table);
 }
 
-void add_to_hash_table(HashTable *table, int value, unsigned long key) {
+void add_to_hash_table(HashTable *table, unsigned long key) {
     HashTableValue *current_value;
     unsigned long index = key % table->size;
 
     if (!table->values[index]) { // if there's no existing key in index
         table->values[index] = create_hash_table_value(key);
-        add_to_start(table->values[index]->indexes, value);
     } else {
         current_value = table->values[index];
 
@@ -71,10 +70,7 @@ void add_to_hash_table(HashTable *table, int value, unsigned long key) {
 
         if (current_value->key != key) { // did not find the key
             current_value->next = create_hash_table_value(key);
-            current_value = current_value->next;
         }
-
-        add_to_start(current_value->indexes, value);
     }
 
 
@@ -92,4 +88,8 @@ IntList *get_key(HashTable *table, unsigned long key) {
     }
 
     return current_value->indexes;
+}
+
+void add_connection(HashTable *table, unsigned long previous, unsigned long next) {
+
 }

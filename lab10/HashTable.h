@@ -15,7 +15,8 @@ typedef struct {
 } HashTable;
 
 HashTable *create_hash_table(long size);
-void add_to_hash_table(HashTable *table, int value, unsigned long key);
+void add_connection(HashTable *table, unsigned long previous, unsigned long next);
+void add_to_hash_table(HashTable *table, unsigned long key);
 IntList *get_key(HashTable *table, unsigned long key);
 void free_hash_table(HashTable *table);
 
