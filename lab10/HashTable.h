@@ -1,11 +1,14 @@
 #ifndef HASHTABLE_H
 #define HASHTABLE_H
 
-#include "IntList.h"
+#include "LongList.h"
+
+#define WORD_MAX_SIZE 51
 
 typedef struct HashTableValue {
-    IntList *indexes;
+    LongList *connections;
     long key;
+    char word[WORD_MAX_SIZE];
     struct HashTableValue *next;
 } HashTableValue;
 
@@ -16,8 +19,8 @@ typedef struct {
 
 HashTable *create_hash_table(long size);
 void add_connection(HashTable *table, unsigned long previous, unsigned long next);
-void add_to_hash_table(HashTable *table, unsigned long key);
-IntList *get_key(HashTable *table, unsigned long key);
+void add_to_hash_table(HashTable *table, unsigned long key, char word[WORD_MAX_SIZE]);
 void free_hash_table(HashTable *table);
+void print_smallest_path(HashTable *table, unsigned long start, unsigned long finish, int weight);
 
 #endif
