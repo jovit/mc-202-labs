@@ -66,11 +66,17 @@ void heapfy(Heap *heap, int i) {
 
 // removes the root from the min heap and returns it
 HeapNode remove_min(Heap *heap) {
-    HeapNode min = heap->nodes[0];
-    heap->nodes[0] = heap->nodes[heap->size-1]; // replace root with the last element
-    heap->size--;
-    // fix heap properties
-    heapfy(heap, 0);
+    HeapNode min;
+    if (heap->size > 0) {
+        min = heap->nodes[0];
+        heap->nodes[0] = heap->nodes[heap->size-1]; // replace root with the last element
+        heap->size--;
+        // fix heap properties
+        heapfy(heap, 0);
+    } else {
+        min.key = 0;
+        min.weight = 0;
+    }
 
     return min;
 }

@@ -12,9 +12,10 @@ unsigned long hash(char str[WORD_MAX_SIZE]) {
 
 int main(void) {
     int number_of_distinct_words, weight, number_of_phrases;
-    int number_of_words_in_phrase;
+    int number_of_words_in_phrase, number_of_phrases_to_generate;
     int i, j;
     unsigned long previous_hash = 0;
+    unsigned long start, finish;
     HashTable *hash_table;
     char word_read[WORD_MAX_SIZE];
 
@@ -24,7 +25,7 @@ int main(void) {
 
     for (i = 0; i < number_of_phrases; i++) {
         scanf("%d", &number_of_words_in_phrase);
-
+        previous_hash = 0;
         for (j = 0; j < number_of_words_in_phrase; j++) {
             scanf(" %s", word_read);
             add_to_hash_table(hash_table, hash(word_read), word_read);
@@ -36,6 +37,20 @@ int main(void) {
             previous_hash = hash(word_read);
         }
     }
+
+    scanf("%d", &number_of_phrases_to_generate);
+
+    for (i = 0; i < number_of_phrases_to_generate; i++) {
+        scanf(" %s", word_read);
+        start = hash(word_read);
+
+        scanf(" %s", word_read);
+        finish = hash(word_read);
+
+        print_smallest_path(hash_table, start, finish, weight);
+    }
+
+
 
     free_hash_table(hash_table);
 

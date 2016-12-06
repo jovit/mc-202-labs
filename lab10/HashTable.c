@@ -1,8 +1,11 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include "HashTable.h"
 #include "Utils.h"
 #include "Heap.h"
+#include "LongList.h"
+#include "TreeAVL.h"
 
 HashTableValue *create_hash_table_value(unsigned long key, char word[WORD_MAX_SIZE]) {
     HashTableValue *value = malloc(sizeof(HashTableValue));
@@ -105,14 +108,52 @@ LongList *get_connections(HashTable *table, unsigned long key) {
 void print_smallest_path(HashTable *table, unsigned long start, unsigned long finish, int weight) {
     HashTableValue *current_value;
     Heap *heap;
+    HeapNode heap_node;
     LongList *connections;
+    LongListNode *current_list_node;
+    TreeAVL *passed_nodes;
+    int previous_weight;
     unsigned long index = start % table->size;
 
     heap = create_heap((int) table->size);
-    
+    passed_nodes = create_tree();
+
     connections = get_connections(table, start);
 
+    for (current_list_node = connections->root; current_list_node != NULL; current_list_node = current_list_node->next) {
+        heap_node.key = current_list_node->value;
+        heap_node.weight = 0;
+
+        insert_to_tree(passed_nodes, current_list_node->value);
+        insert(heap, heap_node);
+    }
+
+    while (1) {
+        heap_node = remove_min(heap);
+
+        if (heap_node.key == 0 && heap_node.weight == 0) {
+            printf("erro");
+            break;
+        }
+
+        if (heap_node.key == finish) {
+            printf("%d", heap_node.weight);
+        }
+
+        previous_weight = heap_node.weight;
+
+        connections = get_connections(table, heap_node.key);
+        for (current_list_node = connections->root; current_list_node != NULL; current_list_node = current_list_node->next) {
+            if (get_count(passed_nodes, current_list_node->value) == 0) {
+                heap_node.key = current_list_node->value;
+                heap_node.weight = weight - current_list_node->count + previous_weight;
+
+                insert_to_tree(passed_nodes, current_list_node->value);
+                insert(heap, heap_node);
+            }
+        }
+    }
 
     free_heap(heap);
-
+    free_tree(passed_nodes);
 }
