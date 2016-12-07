@@ -3,7 +3,8 @@
 
 
 typedef struct TreeAVLNode {
-    long key;
+    unsigned long key;
+    unsigned long parent;
     struct TreeAVLNode *left, *right;
     int height;
     int count;
@@ -14,9 +15,9 @@ typedef struct {
 } TreeAVL;
 
 TreeAVL *create_tree();
-void insert_to_tree(TreeAVL *tree, long key);
-int get_count(TreeAVL *tree, long key);
-int get_total_count(TreeAVL *tree);
+void insert_to_tree(TreeAVL *tree, unsigned long key, unsigned long parent);
+int get_count(TreeAVL *tree, unsigned long key);
+unsigned long get_parent(TreeAVL *tree, unsigned long key);
 void free_tree(TreeAVL* tree);
 
 #endif

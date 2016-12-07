@@ -21,7 +21,7 @@ int main(void) {
 
     scanf("%d %d %d", &number_of_distinct_words, &weight, &number_of_phrases);
 
-    hash_table = create_hash_table(number_of_distinct_words * 2);
+    hash_table = create_hash_table(number_of_distinct_words);
 
     for (i = 0; i < number_of_phrases; i++) {
         scanf("%d", &number_of_words_in_phrase);
@@ -48,6 +48,10 @@ int main(void) {
         finish = hash(word_read);
 
         print_smallest_path(hash_table, start, finish, weight);
+
+        if (i < number_of_phrases_to_generate - 1) {
+            printf("\n");
+        }
     }
 
 

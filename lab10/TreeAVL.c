@@ -59,7 +59,7 @@ void free_tree(TreeAVL *tree) {
 }
 
 // initializes a new node
-TreeAVLNode *new_node(long key) {
+TreeAVLNode *new_node(unsigned long key, unsigned long parent) {
     TreeAVLNode *node = malloc(sizeof(TreeAVLNode));
     validate_malloc(node);
 
@@ -68,6 +68,7 @@ TreeAVLNode *new_node(long key) {
     node->right = NULL;
     node->key = key;
     node->count = 1;
+    node->parent = parent;
 
     return node;
 }
@@ -101,18 +102,18 @@ TreeAVLNode *rotate_to_right(TreeAVLNode *node) {
 }
 
 // companion recursive function to insert_to_tree
-TreeAVLNode *do_add(TreeAVLNode *node, long key) {
-    int names_comparison;
+TreeAVLNode *do_add(TreeAVLNode *node, unsigned long key, unsigned long parent) {
 
     if (node == NULL) { // empty tree
-        return new_node(key);
+        return new_node(key, parent);
     } else {
         if (node->key == key) { // repeated key
             node->count++;
+            node->parent = parent;
         } else if (node->key > key) { // add in the left
-            node->left = do_add(node->left, key);
+            node->left = do_add(node->left, key, parent);
         } else { // add in the right
-            node->right = do_add(node->right, key);
+            node->right = do_add(node->right, key, parent);
         }
 
         // update the height
@@ -136,8 +137,26 @@ TreeAVLNode *do_add(TreeAVLNode *node, long key) {
     return node;
 }
 
-void insert_to_tree(TreeAVL *tree, long key) {
-    tree->root = do_add(tree->root, key);
+void insert_to_tree(TreeAVL *tree, unsigned long key, unsigned long parent) {
+    tree->root = do_add(tree->root, key, parent);
+}
+
+unsigned long do_get_parent(TreeAVLNode *node, long key) {
+    if (node == NULL) {
+        return 0;
+    }
+
+    if (node->key == key) {
+        return node->parent;
+    } else if (node->key > key) {
+        return do_get_parent(node->left, key);
+    } else {
+        return do_get_parent(node->right, key);
+    }
+}
+
+unsigned long get_parent(TreeAVL *tree, unsigned long key) {
+    return do_get_parent(tree->root, key);
 }
 
 int do_get_count(TreeAVLNode *node, long key) {
@@ -154,7 +173,7 @@ int do_get_count(TreeAVLNode *node, long key) {
     }
 }
 
-int get_count(TreeAVL *tree, long key) {
+int get_count(TreeAVL *tree, unsigned long key) {
     return do_get_count(tree->root, key);
 }
 
@@ -164,8 +183,4 @@ int do_get_total_count(TreeAVLNode *node) {
     }
 
     return do_get_total_count(node->left) + do_get_total_count(node->right) + node->count;
-}
-
-int get_total_count(TreeAVL *tree) {
-    return do_get_total_count(tree->root);
 }

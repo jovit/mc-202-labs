@@ -17,7 +17,7 @@ void add_to_start(LongList *list, unsigned long value) {
 
     for (current_node = list->root; current_node != NULL; current_node = current_node->next) {
         if (current_node->value == value) {
-            current_node->value++;
+            current_node->count++;
             break;
         }
     }

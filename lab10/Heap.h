@@ -2,6 +2,7 @@
 #define HEAP_H
 typedef struct {
     int weight;
+    int level;
     unsigned long key;
 } HeapNode;
 typedef struct {
