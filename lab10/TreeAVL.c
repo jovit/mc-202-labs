@@ -177,6 +177,7 @@ int get_count(TreeAVL *tree, unsigned long key) {
     return do_get_count(tree->root, key);
 }
 
+
 int do_get_total_count(TreeAVLNode *node) {
     if (node == NULL) {
         return 0;

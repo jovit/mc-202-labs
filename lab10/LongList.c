@@ -46,3 +46,13 @@ void free_list(LongList *list) {
 
     free(list);
 }
+
+void remove_from_start(LongList *list) {
+    LongListNode *item_to_remove;
+    if (list->root != NULL) {
+        item_to_remove = list->root;
+        list->root = list->root->next;
+
+        free(item_to_remove);
+    }
+}

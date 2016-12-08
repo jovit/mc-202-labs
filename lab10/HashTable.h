@@ -7,8 +7,11 @@
 
 typedef struct HashTableValue {
     LongList *connections;
-    long key;
+    unsigned long key;
     char word[WORD_MAX_SIZE];
+    char visited;
+    int distance;
+    unsigned long previous;
     struct HashTableValue *next;
 } HashTableValue;
 

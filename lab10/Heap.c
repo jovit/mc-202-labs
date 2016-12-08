@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <limits.h>
 #include "Heap.h"
 #include "Utils.h"
 
@@ -93,6 +94,18 @@ Heap *create_heap(int capacity) {
     validate_malloc(new_heap->nodes);
 
     return new_heap;
+}
+
+HeapNode peek_heap(Heap *heap) {
+    HeapNode min;
+    if (heap->size > 0) {
+        min = heap->nodes[0];
+    } else {
+        min.key = 0;
+        min.weight = INT_MAX;
+    }
+
+    return min;
 }
 
 

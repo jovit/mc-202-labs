@@ -1,11 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 #include "HashTable.h"
 #include "Utils.h"
 #include "Heap.h"
 #include "LongList.h"
-#include "TreeAVL.h"
 
 HashTableValue *create_hash_table_value(unsigned long key, char word[WORD_MAX_SIZE]) {
     HashTableValue *value = malloc(sizeof(HashTableValue));
@@ -13,6 +13,7 @@ HashTableValue *create_hash_table_value(unsigned long key, char word[WORD_MAX_SI
     value->connections = create_list();
     value->key = key;
     value->next = NULL;
+    value->visited = 0;
     strcpy(value->word, word);
 
     return value;
@@ -118,6 +119,19 @@ LongList *get_connections(HashTable *table, unsigned long key) {
     return current_value->connections;
 }
 
+HashTableValue *get_value(HashTable *table, unsigned long key) {
+    HashTableValue *current_value;
+    unsigned long index = key % table->size;
+
+    current_value = table->values[index];
+
+    while (current_value->next != NULL && current_value->key != key) { // looks for the key in case of collision
+        current_value = current_value->next;
+    }
+
+    return current_value;
+}
+
 void print_words_by_keys(HashTable *table, unsigned long *path) {
     int i;
 
@@ -130,79 +144,86 @@ void print_words_by_keys(HashTable *table, unsigned long *path) {
 }
 
 void print_smallest_path(HashTable *table, unsigned long start, unsigned long finish, int weight) {
+    int i;
+    int path_size;
+    char found = 0;
+    HashTableValue *current_vertex, *next_vertex;
+    LongListNode *current_list_value;
+    LongList *connections;
+    unsigned long *path;
     Heap *heap;
     HeapNode heap_node;
-    LongList *connections;
-    LongListNode *current_list_node;
-    TreeAVL *passed_nodes;
-    unsigned long *path;
-    int previous_weight, previous_level, i;
-    unsigned long previous_key;
-    char error = 0;
 
-    if (start == finish) {
-        print_word_by_key(table, start);
+    path = malloc(sizeof(unsigned long) * (table->size+1));
+    validate_malloc(path);
+
+    for (i = 0; i < table->size; i++) {
+        if (table->values[i]){
+            current_vertex = table->values[i];
+            while (current_vertex != NULL) {
+                current_vertex->visited = 0;
+                current_vertex->previous = 0;
+                current_vertex->distance = INT_MAX;
+                current_vertex = current_vertex->next;
+            }
+        }
+    }
+
+    current_vertex = get_value(table, start);
+    current_vertex->distance = 0;
+
+    heap = create_heap((int) table->size);
+    heap_node.key = start;
+    heap_node.weight = 0;
+    insert(heap, heap_node);
+
+    while (heap->size > 0) {
+        heap_node = remove_min(heap);
+
+        if (heap_node.key == finish) {
+            found = 1;
+            break;
+        }
+
+        connections = get_connections(table, heap_node.key);
+        current_vertex = get_value(table, heap_node.key);
+        current_vertex->visited = 1;
+
+        for (current_list_value = connections->root; current_list_value; current_list_value = current_list_value->next) {
+            next_vertex = get_value(table, current_list_value->value);
+
+            if (!next_vertex->visited && (current_vertex->distance + (weight - current_list_value->count)) <= next_vertex->distance) {
+                next_vertex->previous = current_vertex->key;
+                next_vertex->distance = current_vertex->distance + (weight - current_list_value->count);
+                heap_node.key = next_vertex->key;
+                heap_node.weight = next_vertex->distance;
+
+                insert(heap, heap_node);
+            }
+        }
+    }
+
+    if (!found) {
+        printf("erro");
     } else {
-        heap = create_heap((int) table->size);
-        passed_nodes = create_tree();
-        path = malloc(sizeof(unsigned long) * (table->size+1));
-        validate_malloc(path);
-
-        connections = get_connections(table, start);
-
-        for (current_list_node = connections->root; current_list_node != NULL; current_list_node = current_list_node->next) {
-            heap_node.key = current_list_node->value;
-            heap_node.weight = weight - current_list_node->count;
-            heap_node.level = 1;
-
-            insert_to_tree(passed_nodes, current_list_node->value, start);
-            insert(heap, heap_node);
+        current_vertex = get_value(table, finish);
+        for (path_size = 0; current_vertex->distance > 0; current_vertex = get_value(table, current_vertex->previous)) {
+            path_size++;
         }
 
-        while (1) {
-            heap_node = remove_min(heap);
-
-            if (heap_node.key == 0 && heap_node.weight == 0) {
-                printf("erro");
-                error = 1;
-                break;
-            }
-
-            if (heap_node.key == finish) {
-                previous_key = heap_node.key;
-
-                path[heap_node.level + 1] = 0;
-                for (i = heap_node.level; i >= 0; i--) {
-                    path[i] = previous_key;
-                    previous_key = get_parent(passed_nodes, previous_key);
-                }
-
-                break;
-            }
-
-            previous_weight = heap_node.weight;
-            previous_level = heap_node.level;
-            previous_key = heap_node.key;
-
-            connections = get_connections(table, heap_node.key);
-            for (current_list_node = connections->root; current_list_node != NULL; current_list_node = current_list_node->next) {
-                if (get_count(passed_nodes, current_list_node->value) == 0) {
-                    heap_node.key = current_list_node->value;
-                    heap_node.weight = weight - current_list_node->count + previous_weight;
-                    heap_node.level = previous_level + 1;
-
-                    insert_to_tree(passed_nodes, current_list_node->value, previous_key);
-                    insert(heap, heap_node);
-                }
+        path[path_size+1] = 0;
+        for (current_vertex = get_value(table, finish); path_size >= 0; path_size--) {
+            path[path_size] = current_vertex->key;
+            if (path_size > 0) {
+                current_vertex = get_value(table, current_vertex->previous);
             }
         }
 
-        if (!error) {
-            print_words_by_keys(table, path);
-        }
+        print_words_by_keys(table, path);
 
-        free_heap(heap);
-        free_tree(passed_nodes);
         free(path);
     }
+
+
+    free(heap);
 }

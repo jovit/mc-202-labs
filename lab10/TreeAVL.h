@@ -1,7 +1,6 @@
 #ifndef TREEAVL_H
 #define TREEAVL_H
 
-
 typedef struct TreeAVLNode {
     unsigned long key;
     unsigned long parent;
