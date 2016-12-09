@@ -12,7 +12,6 @@ typedef struct {
 
 LongList *create_list();
 void add_to_start(LongList *list, unsigned long value);
-void remove_from_start(LongList *list);
 void free_list(LongList *list);
 
 #endif

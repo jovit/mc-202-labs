@@ -23,6 +23,7 @@ int main(void) {
 
     hash_table = create_hash_table(number_of_distinct_words);
 
+    // read all phrases and create the vertexes and connections for the graph
     for (i = 0; i < number_of_phrases; i++) {
         scanf("%d", &number_of_words_in_phrase);
         previous_hash = 0;
@@ -40,6 +41,7 @@ int main(void) {
 
     scanf("%d", &number_of_phrases_to_generate);
 
+    // read the start and ending points and print the paths
     for (i = 0; i < number_of_phrases_to_generate; i++) {
         scanf(" %s", word_read);
         start = hash(word_read);
